@@ -3,53 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سامانه کلاس آنلاین</title>
+    <title>آکادمی آنلاین من | ورود به سامانه</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body {
-            font-family: Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Vazirmatn', sans-serif;
+            background: #f0f4f8;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: #333;
+            min-height: 100vh;
+            color: #2d3748;
         }
         .container {
             background: white;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 85%;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            display: flex;
+            max-width: 900px;
+            width: 92%;
+            overflow: hidden;
+            flex-direction: row;
         }
-        h1 { color: #333; margin-bottom: 10px; }
-        p { color: #666; margin-bottom: 30px; }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 15px 0;
-            border: none;
-            border-radius: 10px;
+        .text-section {
+            padding: 50px 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .image-section {
+            flex: 1;
+            /* عکس کلاس آنلاین و تخته سیاه */
+            background: url('https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=2070&auto=format&fit=crop') center/cover;
+            min-height: 450px;
+            border-radius: 30px 0 0 30px;
+        }
+        h1 {
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: #1a202c;
+        }
+        p {
             font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.8;
         }
-        .btn-login { background-color: #4CAF50; color: white; }
-        .btn-class { background-color: #2196F3; color: white; }
-        .btn:hover { transform: scale(1.05); }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn svg {
+            margin-left: 12px;
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        .btn-login {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        .btn-login:hover { background: #059669; transform: translateY(-3px); }
+        
+        .btn-class {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-class:hover { background: #2563eb; transform: translateY(-3px); }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 20px 0;
+            }
+            .image-section {
+                min-height: 250px;
+                border-radius: 30px 30px 0 0;
+                order: -1; /* عکس میاد بالا */
+            }
+            .text-section { padding: 30px 20px; }
+            h1 { font-size: 26px; }
+            .btn { padding: 15px; font-size: 16px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>آکادمی آنلاین من</h1>
-        <p>به سامانه آموزشی خوش آمدید</p>
-        <a href="https://ol.moodlecloud.com" class="btn btn-login">ورود به پنل کاربری</a>
-        <a href="https://ol.moodlecloud.com/course/view.php?id=2" class="btn btn-class">ورود به کلاس آنلاین</a>
+        <div class="image-section"></div>
+        <div class="text-section">
+            <h1>آکادمی آنلاین من</h1>
+            <p>به سامانه آموزشی هوشمند خوش آمدید. برای شرکت در کلاس‌ها و مشاهده آزمون‌ها وارد پنل کاربری خود شوید.</p>
+            
+            <a href="https://ol.moodlecloud.com" class="btn btn-login">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                ورود به پنل کاربری
+            </a>
+            
+            <a href="https://ol.moodlecloud.com/course/view.php?id=2" class="btn btn-class">
+                <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                ورود مستقیم به کلاس آنلاین
+            </a>
+        </div>
     </div>
 </body>
 </html>
