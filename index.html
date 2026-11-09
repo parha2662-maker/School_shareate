@@ -8,178 +8,49 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
-        
-        body {
-            background: #09090b;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* افکت نورهای شناور سه بعدی پس زمینه */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: 0;
-            animation: float 8s infinite alternate ease-in-out;
-        }
+        body { background: #09090b; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; overflow: hidden; position: relative; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; animation: float 8s infinite alternate ease-in-out; }
         .orb-1 { width: 300px; height: 300px; background: rgba(59, 130, 246, 0.4); top: -10%; left: -10%; }
         .orb-2 { width: 250px; height: 250px; background: rgba(139, 92, 246, 0.4); bottom: -10%; right: -10%; animation-delay: -4s; }
         .orb-3 { width: 200px; height: 200px; background: rgba(16, 185, 129, 0.3); top: 40%; left: 60%; animation-delay: -2s; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.1); }
-        }
-
-        /* کارت شیشه ای با عمق سه بعدی */
-        .container {
-            background: rgba(20, 20, 25, 0.6);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 40px 30px;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-            text-align: center;
-            z-index: 10;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: cardFloat 6s ease-in-out infinite;
-        }
-
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        .container { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); border-radius: 24px; padding: 40px 30px; max-width: 420px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); text-align: center; z-index: 10; position: relative; transform-style: preserve-3d; animation: cardFloat 6s ease-in-out infinite; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .hidden { display: none !important; }
-        
-        h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #60a5fa, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 15px rgba(96, 165, 250, 0.4);
-        }
+        h1 { font-size: 28px; margin-bottom: 15px; font-weight: 900; background: linear-gradient(135deg, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 15px rgba(96, 165, 250, 0.4); }
         h2 { font-size: 22px; margin-bottom: 20px; color: #f8fafc; }
         p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; }
-
-        /* کادرهای ورودی */
-        input {
-            width: 100%;
-            padding: 16px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.4);
-            color: white;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
-        }
-        input:focus {
-            border-color: #60a5fa;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(96, 165, 250, 0.3);
-        }
-
-        /* دکمه های سه بعدی */
-        button {
-            width: 100%;
-            padding: 16px;
-            border-radius: 12px;
-            border: none;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 15px;
-            transition: all 0.1s ease;
-            position: relative;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transform: translateY(-4px);
-        }
-
+        input { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; font-size: 15px; outline: none; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); }
+        input:focus { border-color: #60a5fa; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(96, 165, 250, 0.3); }
+        button { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: all 0.1s ease; position: relative; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translateY(-4px); }
         button:active { transform: translateY(2px); }
-
-        /* استایل دکمه غیرفعال (قفل) */
-        button:disabled {
-            background: #334155 !important;
-            color: #94a3b8;
-            box-shadow: 0 6px 0 #1e293b !important;
-            cursor: not-allowed;
-            transform: translateY(0);
-            text-shadow: none;
-        }
-
+        button:disabled { background: #334155 !important; color: #94a3b8; box-shadow: 0 6px 0 #1e293b !important; cursor: not-allowed; transform: translateY(0); text-shadow: none; }
         .btn-main { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 6px 0 #1d4ed8, 0 15px 20px rgba(37, 99, 235, 0.4); }
         .btn-green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 0 #047857, 0 15px 20px rgba(5, 150, 105, 0.4); }
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 6px 0 #5b21b6, 0 15px 20px rgba(124, 58, 237, 0.4); }
         .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 0 #991b1b, 0 15px 20px rgba(220, 38, 38, 0.4); }
-
-        /* نشانگر وضعیت کلاس */
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
         .status-offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
         .status-online { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; animation: pulse 2s infinite; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        /* لیست کاربران */
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
         .user-list { text-align: right; margin-top: 15px; max-height: 150px; overflow-y: auto; }
-        .user-item { 
-            background: rgba(255,255,255,0.05); 
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            margin-bottom: 10px; 
-            font-size: 14px; 
-            display: flex; 
-            justify-content: space-between; 
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .user-item { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .back-link { color: #94a3b8; font-size: 13px; cursor: pointer; display: block; margin-top: 15px; text-decoration: none; transition: 0.3s; }
         .back-link:hover { color: #fff; }
     </style>
 </head>
 <body>
-
-    <!-- نورهای سه بعدی پس زمینه -->
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
     <div class="container">
-        <!-- صفحه اصلی -->
         <div id="view-main">
             <h1>مدرسه شریعتی</h1>
             <p>به سامانه آموزشی هوشمند خوش آمدید</p>
             <button class="btn-main" onclick="showView('view-login')">ورود به سامانه</button>
         </div>
 
-        <!-- صفحه ورود -->
         <div id="view-login" class="hidden">
             <h1>ورود به سامانه</h1>
             <input type="text" id="login-username" placeholder="نام کاربری (آیدی)">
@@ -188,18 +59,15 @@
             <span class="back-link" onclick="showView('view-main')">بازگشت به صفحه اصلی</span>
         </div>
 
-        <!-- پنل مدیریت -->
         <div id="view-admin-panel" class="hidden">
             <h2>پنل مدیریت</h2>
             <button class="btn-green" onclick="showView('view-add-student')">➕ افزودن دانش‌آموز</button>
             <button class="btn-purple" onclick="showView('view-add-teacher')">➕ افزودن معلم</button>
-            
             <p style="margin-top: 25px; margin-bottom: 10px; text-align: right;">لیست کاربران ثبت‌شده:</p>
             <div class="user-list" id="user-list-container"></div>
             <button class="btn-red" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- فرم دانش‌آموز -->
         <div id="view-add-student" class="hidden">
             <h2 style="color:#10b981;">افزودن دانش‌آموز</h2>
             <input type="text" id="student-name" placeholder="نام (مثلا علی)">
@@ -209,7 +77,6 @@
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
-        <!-- فرم معلم -->
         <div id="view-add-teacher" class="hidden">
             <h2 style="color:#8b5cf6;">افزودن معلم</h2>
             <input type="text" id="teacher-name" placeholder="نام معلم (مثلا استاد احمدی)">
@@ -219,42 +86,31 @@
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
-        <!-- پنل معلم -->
         <div id="view-teacher-panel" class="hidden">
             <h2>پنل معلم</h2>
             <p style="text-align:right; margin-bottom:20px; color: #8b5cf6;">خوش آمدید استاد <span id="teacher-name-display" style="font-weight:bold;"></span></p>
-            
-            <!-- دکمه شروع کلاس -->
             <button id="btn-start-class" class="btn-purple" onclick="startClass()">🚀 شروع کلاس آنلاین</button>
-            
-            <!-- دکمه پایان کلاس (اولش مخفی) -->
             <button id="btn-end-class" class="btn-red hidden" onclick="endClass()">⛔️ پایان کلاس</button>
-            
             <button class="btn-main" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- پنل دانش‌آموز -->
         <div id="view-student-panel" class="hidden">
             <h2>پنل دانش‌آموز</h2>
             <p style="text-align:right; margin-bottom:10px; color: #10b981;">خوش آمدی <span id="student-name-display" style="font-weight:bold;"></span> 👋</p>
-            
-            <!-- نشانگر وضعیت کلاس -->
             <div id="class-status-badge" class="status-badge status-offline">کلاس فعلا شروع نشده است</div>
-            
-            <!-- دکمه ورود به کلاس (در ابتدا قفل) -->
             <button id="btn-join-class" class="btn-green" onclick="joinClass()" disabled>🔒 ورود به کلاس آنلاین</button>
-            
             <button class="btn-main" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
     </div>
 
     <script>
-        // کلیدهای اتصال به دیتابیس سوپابیس
         const SUPABASE_URL = 'https://fsplrygrrlujxzhftbmo.supabase.co'; 
         const SUPABASE_KEY = 'sb_publishable_8nabIvaquNCZO28qFZlLKA_pR47OdtC';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         let realtimeChannel = null;
+
+        // 🌟 لینک رایگان و بدون محدودیت کلاس 🌟
+        const CLASS_LINK = 'https://framatalk.org/parham-school-2026';
 
         function showView(viewId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
@@ -269,14 +125,11 @@
             document.getElementById('login-password').value = '';
         }
 
-        // ----------------------------------------
-        // منطق کلاس آنلاین (شروع، پایان، ورود)
-        // ----------------------------------------
         async function startClass() {
             await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
             document.getElementById('btn-start-class').classList.add('hidden');
             document.getElementById('btn-end-class').classList.remove('hidden');
-            window.open('https://meet.google.com/pty-ojxr-cco', '_blank');
+            window.open(CLASS_LINK, '_blank');
         }
 
         async function endClass() {
@@ -291,7 +144,6 @@
             const isActive = data ? data.is_active : false;
             updateStudentUI(isActive);
 
-            // فعالسازی سیستم لحظه‌ای (Realtime) برای دانش‌آموز
             realtimeChannel = supabaseClient.channel('class_status_changes')
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'class_status' }, payload => {
                     updateStudentUI(payload.new.is_active);
@@ -316,15 +168,11 @@
         }
 
         function joinClass() {
-            window.open('https://meet.google.com/pty-ojxr-cco', '_blank');
+            window.open(CLASS_LINK, '_blank');
         }
 
-        // ----------------------------------------
-        // منطق مدیریت کاربران (ادمین)
-        // ----------------------------------------
         async function addUser(role) {
             let name, username, password;
-
             if (role === 'student') {
                 name = document.getElementById('student-name').value;
                 username = document.getElementById('student-username').value;
@@ -336,7 +184,6 @@
             }
 
             if(!name || !username || !password) return alert('لطفاً همه فیلدها را پر کنید');
-
             const { error } = await supabaseClient.from('users').insert([{ name, username, password, role }]);
             
             if (error) {
@@ -361,44 +208,31 @@
             container.innerHTML = 'در حال دریافت...';
             const { data: users, error } = await supabaseClient.from('users').select('*');
             container.innerHTML = '';
-            
             if (error || users.length === 0) return container.innerHTML = 'هیچ کاربری ثبت نشده است.';
-            
             users.forEach(u => {
                 const color = u.role === 'teacher' ? '#8b5cf6' : '#10b981';
                 const roleName = u.role === 'teacher' ? 'معلم' : 'دانش‌آموز';
-                container.innerHTML += `
-                    <div class="user-item">
-                        <span>${u.name} <small style="color:${color}; margin-right: 5px;">(${roleName})</small></span>
-                        <span style="color: #60a5fa; font-family: sans-serif;">${u.username}</span>
-                    </div>`;
+                container.innerHTML += `<div class="user-item"><span>${u.name} <small style="color:${color}; margin-right: 5px;">(${roleName})</small></span><span style="color: #60a5fa; font-family: sans-serif;">${u.username}</span></div>`;
             });
         }
 
-        // ----------------------------------------
-        // منطق ورود (Login)
-        // ----------------------------------------
         async function loginUser() {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
 
-            // ورود ادمین (خودت)
             if (username === 'admin' && password === 'parham2010') {
                 document.getElementById('login-password').value = '';
                 showView('view-admin-panel');
                 return;
             }
 
-            // ورود کاربران از دیتابیس
             const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
             
             if (users && users.length > 0) {
                 const user = users[0];
                 document.getElementById('login-password').value = ''; 
-
                 if (user.role === 'teacher') {
                     document.getElementById('teacher-name-display').innerText = user.name;
-                    // چک کردن اینکه اگر کلاس از قبل استارت بوده، دکمه پایان رو نشون بده
                     const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
                     if(status && status.is_active) {
                         document.getElementById('btn-start-class').classList.add('hidden');
