@@ -45,7 +45,7 @@
     <div class="orb orb-3"></div>
 
     <div class="container">
-        <!-- صفحه اول دقیقا مثل عکس خودت -->
+        <!-- صفحه اول دقیقا مثل عکس خودت (فقط یه دکمه آبی) -->
         <div id="view-main">
             <h1>مدرسه شریعتی</h1>
             <p>به سامانه آموزشی هوشمند خوش آمدید</p>
@@ -107,7 +107,6 @@
         let realtimeChannel = null;
         let currentUserName = "";
 
-        // 🌟 تابع جادویی جیتسی: اسم رو خودکار پر میکنه و صفحه ورود رو رد میکنه 🌟
         function getJitsiLink(name) {
             const room = 'parham-school-2026';
             return `https://meet.jit.si/${room}#config.prejoinPageEnabled=false&userInfo.displayName="${encodeURIComponent(name)}"`;
@@ -127,19 +126,16 @@
             currentUserName = "";
         }
 
-        // ورود هوشمند (همه از یه دکمه میان تو)
         async function loginUser() {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
 
-            // 1. ادمین (تو)
             if (username === 'admin' && password === 'parham2010') {
                 document.getElementById('login-password').value = '';
                 showView('view-admin-panel');
                 return;
             }
 
-            // 2. معلم یا دانش‌آموز از دیتابیس
             const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
             
             if (users && users.length > 0) {
@@ -168,7 +164,6 @@
             }
         }
 
-        // ورود سریع دانش‌آموز (فقط با اسم)
         function studentQuickEnter() {
             const name = document.getElementById('login-username').value;
             if(!name) return alert('لطفاً نام خود را در کادر اول وارد کنید');
@@ -178,9 +173,6 @@
             checkStudentClassStatus();
         }
 
-        // ----------------------------------------
-        // منطق کلاس
-        // ----------------------------------------
         async function startClass() {
             await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
             document.getElementById('btn-start-class').classList.add('hidden');
@@ -227,9 +219,6 @@
             window.open(getJitsiLink(currentUserName), '_blank');
         }
 
-        // ----------------------------------------
-        // مدیریت معلم‌ها (ادمین)
-        // ----------------------------------------
         async function addTeacher() {
             const name = document.getElementById('teacher-name').value;
             const username = document.getElementById('teacher-username').value;
