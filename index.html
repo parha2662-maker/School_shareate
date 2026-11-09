@@ -8,36 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
-        body {
-            background: radial-gradient(circle at top left, #1a202c, #0f172a);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 40px;
-            max-width: 450px;
-            width: 92%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
+        body { background: radial-gradient(circle at top left, #1a202c, #0f172a); min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; }
+        .container { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 40px; max-width: 450px; width: 92%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; }
         .hidden { display: none !important; }
         h1 { font-size: 26px; margin-bottom: 20px; color: #60a5fa; }
         h2 { font-size: 20px; margin-bottom: 20px; color: #10b981; }
-        input {
-            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; font-size: 16px;
-        }
-        button {
-            width: 100%; padding: 15px; border-radius: 10px; border: none; background: #3b82f6;
-            color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px;
-        }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; font-size: 16px; }
+        button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: #3b82f6; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
         .btn-admin { background: #f59e0b; }
         .btn-green { background: #10b981; }
         .btn-red { background: #ef4444; }
@@ -99,9 +76,9 @@
     </div>
 
     <script>
-        // 🚨 این دو خط رو باید با اطلاعات سوپابیس عوض کنی 🚨
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // اطلاعات دیتابیس تو اینجاست
+        const SUPABASE_URL = 'https://fsplrygrrlujxzhftbmo.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_8nabIvaquNCZO28qFZlLKA_pR47OdtC';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
