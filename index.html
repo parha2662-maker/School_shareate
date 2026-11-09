@@ -3,159 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آکادمی آنلاین من | ورود به سامانه</title>
+    <title>آکادمی آنلاین من</title>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            /* پس زمینه سه بعدی تیره */
             background: radial-gradient(circle at top left, #1a202c, #0f172a);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             color: #fff;
-            overflow: hidden;
-            perspective: 1000px; /* ایجاد حس عمق 3D */
         }
-
-        /* حباب های شناور سه بعدی در پس زمینه */
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            animation: float 6s ease-in-out infinite;
-        }
-        .blob1 { width: 300px; height: 300px; background: #3b82f6; top: 10%; left: 10%; opacity: 0.5; }
-        .blob2 { width: 250px; height: 250px; background: #10b981; bottom: 10%; right: 10%; opacity: 0.4; animation-delay: -3s; }
-
-        @keyframes float {
-            0% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
-            100% { transform: translateY(0px) scale(1); }
-        }
-
-        /* کارت اصلی با افکت شیشه ای */
-        .card {
+        .container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px;
-            padding: 50px 40px;
+            padding: 40px;
             max-width: 450px;
-            width: 90%;
+            width: 92%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease;
         }
-
-        .card:hover {
-            transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
+        .hidden { display: none !important; }
+        h1 { font-size: 26px; margin-bottom: 20px; color: #60a5fa; }
+        h2 { font-size: 20px; margin-bottom: 20px; color: #10b981; }
+        input {
+            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; font-size: 16px;
         }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 900;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #60a5fa, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        button {
+            width: 100%; padding: 15px; border-radius: 10px; border: none; background: #3b82f6;
+            color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px;
         }
-
-        p {
-            font-size: 15px;
-            color: #94a3b8;
-            margin-bottom: 40px;
-            line-height: 1.8;
-        }
-
-        /* استایل دکمه های سه بعدی */
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 17px;
-            font-weight: 700;
-            text-decoration: none;
-            margin-bottom: 25px;
-            position: relative;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            transform-style: preserve-3d;
-        }
-
-        .btn svg { margin-left: 10px; width: 22px; height: 22px; fill: currentColor; }
-
-        /* دکمه سبز */
-        .btn-login {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            box-shadow: 0 8px 0 #047857, 0 15px 20px rgba(16, 185, 129, 0.4);
-            transform: translateY(-4px);
-        }
-        .btn-login:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 0 #047857, 0 20px 25px rgba(16, 185, 129, 0.5);
-        }
-        .btn-login:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #047857, 0 5px 10px rgba(16, 185, 129, 0.4);
-        }
-
-        /* دکمه آبی */
-        .btn-class {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            box-shadow: 0 8px 0 #1d4ed8, 0 15px 20px rgba(59, 130, 246, 0.4);
-            transform: translateY(-4px);
-        }
-        .btn-class:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 0 #1d4ed8, 0 20px 25px rgba(59, 130, 246, 0.5);
-        }
-        .btn-class:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #1d4ed8, 0 5px 10px rgba(59, 130, 246, 0.4);
-        }
-
-        @media (max-width: 768px) {
-            .card { padding: 40px 25px; margin: 20px 0; }
-            h1 { font-size: 26px; }
-        }
+        .btn-admin { background: #f59e0b; }
+        .btn-green { background: #10b981; }
+        .btn-red { background: #ef4444; }
+        .card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 15px; text-align: right; border-right: 4px solid #3b82f6; }
+        .user-list { text-align: right; margin-top: 15px; max-height: 150px; overflow-y: auto; }
+        .user-item { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; }
+        .back-link { color: #94a3b8; font-size: 13px; cursor: pointer; display: block; margin-top: 15px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div id="view-main">
+            <h1>آکادمی آنلاین من</h1>
+            <p style="color: #94a3b8; margin-bottom: 30px;">به سامانه آموزشی خوش آمدید</p>
+            <button onclick="showView('view-student-login')">ورود دانش‌آموز</button>
+            <button class="btn-admin" onclick="showView('view-admin-login')">ورود مدیریت (مدیر)</button>
+        </div>
 
-    <!-- حباب های نورانی پس زمینه -->
-    <div class="blob blob1"></div>
-    <div class="blob blob2"></div>
+        <div id="view-admin-login" class="hidden">
+            <h1 style="color: #f59e0b;">ورود مدیریت</h1>
+            <input type="password" id="admin-pass" placeholder="رمز مدیریت (parham2010)">
+            <button class="btn-admin" onclick="checkAdmin()">ورود</button>
+            <span class="back-link" onclick="showView('view-main')">بازگشت</span>
+        </div>
 
-    <div class="card">
-        <h1>آکادمی آنلاین من</h1>
-        <p>به سامانه آموزشی هوشمند خوش آمدید. برای شرکت در کلاس‌ها و مشاهده آزمون‌ها وارد پنل کاربری خود شوید.</p>
-        
-        <!-- دکمه ورود به مودل -->
-        <a href="https://shareate-school.moodlecloud.com" class="btn btn-login">
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            ورود به پنل کاربری
-        </a>
-        
-        <!-- دکمه ورود به کلاس گوگل میت -->
-        <a href="https://meet.google.com/pty-ojxr-cco" class="btn btn-class" target="_blank">
-            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-            ورود مستقیم به کلاس آنلاین
-        </a>
+        <div id="view-admin-panel" class="hidden">
+            <h2>پنل مدیریت</h2>
+            <button class="btn-green" onclick="showView('view-add-user')">➕ افزودن کاربر</button>
+            <p style="margin-top: 20px; text-align: right; font-size: 14px;">کاربران دیتابیس:</p>
+            <div class="user-list" id="user-list-container"></div>
+            <button class="btn-red" style="margin-top: 20px;" onclick="showView('view-main')">خروج</button>
+        </div>
+
+        <div id="view-add-user" class="hidden">
+            <h2>افزودن کاربر</h2>
+            <input type="text" id="new-name" placeholder="نام (مثلا علی)">
+            <input type="text" id="new-username" placeholder="آیدی (مثلا ali123)">
+            <input type="password" id="new-password" placeholder="رمز عبور">
+            <button class="btn-green" onclick="addUser()">ذخیره</button>
+            <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
+        </div>
+
+        <div id="view-student-login" class="hidden">
+            <h1>ورود دانش‌آموز</h1>
+            <input type="text" id="login-username" placeholder="آیدی">
+            <input type="password" id="login-password" placeholder="رمز">
+            <button onclick="studentLogin()">ورود به کلاس</button>
+            <span class="back-link" onclick="showView('view-main')">بازگشت</span>
+        </div>
+
+        <div id="view-student-panel" class="hidden">
+            <h2>خوش آمدی، <span id="student-name"></span> 👋</h2>
+            <div class="card">
+                <h3>📚 کلاس آنلاین</h3>
+                <button class="btn-green" style="margin-top: 10px;" onclick="window.open('https://meet.google.com/pty-ojxr-cco', '_blank')">ورود به کلاس</button>
+            </div>
+            <button class="btn-red" onclick="showView('view-main')">خروج</button>
+        </div>
     </div>
 
+    <script>
+        // 🚨 این دو خط رو باید با اطلاعات سوپابیس عوض کنی 🚨
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function showView(viewId) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'view-admin-panel') loadUsers();
+        }
+
+        function checkAdmin() {
+            if (document.getElementById('admin-pass').value === 'parham2010') {
+                showView('view-admin-panel');
+            } else { alert('رمز اشتباه است!'); }
+        }
+
+        async function addUser() {
+            const name = document.getElementById('new-name').value;
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+
+            if(!name || !username || !password) return alert('همه فیلدها را پر کنید');
+
+            const { error } = await supabaseClient.from('users').insert([{ name, username, password }]);
+            
+            if (error) {
+                alert(error.code === '23505' ? 'این آیدی تکراری است!' : 'خطا: ' + error.message);
+            } else {
+                alert('کاربر ذخیره شد!');
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-username').value = '';
+                document.getElementById('new-password').value = '';
+                showView('view-admin-panel');
+            }
+        }
+
+        async function loadUsers() {
+            const container = document.getElementById('user-list-container');
+            container.innerHTML = 'در حال دریافت...';
+            const { data: users, error } = await supabaseClient.from('users').select('*');
+            container.innerHTML = '';
+            if (error || users.length === 0) return container.innerHTML = 'هیچ کاربری نیست.';
+            users.forEach(u => {
+                container.innerHTML += `<div class="user-item"><span>${u.name}</span><span style="color: #60a5fa;">${u.username}</span></div>`;
+            });
+        }
+
+        async function studentLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
+            
+            if (users && users.length > 0) {
+                document.getElementById('student-name').innerText = users[0].name;
+                showView('view-student-panel');
+            } else { alert('آیدی یا رمز اشتباه است!'); }
+        }
+    </script>
 </body>
 </html>
