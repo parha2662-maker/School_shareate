@@ -112,33 +112,40 @@
             transform: translateY(-4px);
         }
 
-        button:active {
-            transform: translateY(2px);
+        button:active { transform: translateY(2px); }
+
+        /* استایل دکمه غیرفعال (قفل) */
+        button:disabled {
+            background: #334155 !important;
+            color: #94a3b8;
+            box-shadow: 0 6px 0 #1e293b !important;
+            cursor: not-allowed;
+            transform: translateY(0);
+            text-shadow: none;
         }
 
-        .btn-main { 
-            background: linear-gradient(135deg, #3b82f6, #2563eb); 
-            box-shadow: 0 6px 0 #1d4ed8, 0 15px 20px rgba(37, 99, 235, 0.4); 
-        }
-        .btn-main:active { box-shadow: 0 0 0 #1d4ed8, 0 5px 10px rgba(37, 99, 235, 0.4); }
+        .btn-main { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 6px 0 #1d4ed8, 0 15px 20px rgba(37, 99, 235, 0.4); }
+        .btn-green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 6px 0 #047857, 0 15px 20px rgba(5, 150, 105, 0.4); }
+        .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 6px 0 #5b21b6, 0 15px 20px rgba(124, 58, 237, 0.4); }
+        .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 6px 0 #991b1b, 0 15px 20px rgba(220, 38, 38, 0.4); }
 
-        .btn-green { 
-            background: linear-gradient(135deg, #10b981, #059669); 
-            box-shadow: 0 6px 0 #047857, 0 15px 20px rgba(5, 150, 105, 0.4); 
+        /* نشانگر وضعیت کلاس */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
-        .btn-green:active { box-shadow: 0 0 0 #047857, 0 5px 10px rgba(5, 150, 105, 0.4); }
+        .status-offline { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .status-online { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; animation: pulse 2s infinite; }
 
-        .btn-purple { 
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed); 
-            box-shadow: 0 6px 0 #5b21b6, 0 15px 20px rgba(124, 58, 237, 0.4); 
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
-        .btn-purple:active { box-shadow: 0 0 0 #5b21b6, 0 5px 10px rgba(124, 58, 237, 0.4); }
-
-        .btn-red { 
-            background: linear-gradient(135deg, #ef4444, #dc2626); 
-            box-shadow: 0 6px 0 #991b1b, 0 15px 20px rgba(220, 38, 38, 0.4); 
-        }
-        .btn-red:active { box-shadow: 0 0 0 #991b1b, 0 5px 10px rgba(220, 38, 38, 0.4); }
 
         /* لیست کاربران */
         .user-list { text-align: right; margin-top: 15px; max-height: 150px; overflow-y: auto; }
@@ -217,25 +224,37 @@
             <h2>پنل معلم</h2>
             <p style="text-align:right; margin-bottom:20px; color: #8b5cf6;">خوش آمدید استاد <span id="teacher-name-display" style="font-weight:bold;"></span></p>
             
-            <button class="btn-purple" onclick="window.open('https://meet.google.com/pty-ojxr-cco', '_blank')">🚀 شروع کلاس آنلاین</button>
-            <button class="btn-red" onclick="logout()">خروج</button>
+            <!-- دکمه شروع کلاس -->
+            <button id="btn-start-class" class="btn-purple" onclick="startClass()">🚀 شروع کلاس آنلاین</button>
+            
+            <!-- دکمه پایان کلاس (اولش مخفی) -->
+            <button id="btn-end-class" class="btn-red hidden" onclick="endClass()">⛔️ پایان کلاس</button>
+            
+            <button class="btn-main" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
 
         <!-- پنل دانش‌آموز -->
         <div id="view-student-panel" class="hidden">
             <h2>پنل دانش‌آموز</h2>
-            <p style="text-align:right; margin-bottom:20px; color: #10b981;">خوش آمدی <span id="student-name-display" style="font-weight:bold;"></span> 👋</p>
+            <p style="text-align:right; margin-bottom:10px; color: #10b981;">خوش آمدی <span id="student-name-display" style="font-weight:bold;"></span> 👋</p>
             
-            <button class="btn-green" onclick="window.open('https://meet.google.com/pty-ojxr-cco', '_blank')">ورود به کلاس آنلاین</button>
-            <button class="btn-red" onclick="logout()">خروج</button>
+            <!-- نشانگر وضعیت کلاس -->
+            <div id="class-status-badge" class="status-badge status-offline">کلاس فعلا شروع نشده است</div>
+            
+            <!-- دکمه ورود به کلاس (در ابتدا قفل) -->
+            <button id="btn-join-class" class="btn-green" onclick="joinClass()" disabled>🔒 ورود به کلاس آنلاین</button>
+            
+            <button class="btn-main" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
     </div>
 
     <script>
+        // کلیدهای اتصال به دیتابیس سوپابیس
         const SUPABASE_URL = 'https://fsplrygrrlujxzhftbmo.supabase.co'; 
         const SUPABASE_KEY = 'sb_publishable_8nabIvaquNCZO28qFZlLKA_pR47OdtC';
-        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let realtimeChannel = null;
 
         function showView(viewId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
@@ -244,11 +263,65 @@
         }
 
         function logout() {
+            if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
             showView('view-main');
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
         }
 
+        // ----------------------------------------
+        // منطق کلاس آنلاین (شروع، پایان، ورود)
+        // ----------------------------------------
+        async function startClass() {
+            await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
+            document.getElementById('btn-start-class').classList.add('hidden');
+            document.getElementById('btn-end-class').classList.remove('hidden');
+            window.open('https://meet.google.com/pty-ojxr-cco', '_blank');
+        }
+
+        async function endClass() {
+            await supabaseClient.from('class_status').update({ is_active: false }).eq('id', 'main_class');
+            document.getElementById('btn-start-class').classList.remove('hidden');
+            document.getElementById('btn-end-class').classList.add('hidden');
+            alert('کلاس پایان یافت. وضعیت برای دانش‌آموزان قفل شد.');
+        }
+
+        async function checkStudentClassStatus() {
+            const { data } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
+            const isActive = data ? data.is_active : false;
+            updateStudentUI(isActive);
+
+            // فعالسازی سیستم لحظه‌ای (Realtime) برای دانش‌آموز
+            realtimeChannel = supabaseClient.channel('class_status_changes')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'class_status' }, payload => {
+                    updateStudentUI(payload.new.is_active);
+                }).subscribe();
+        }
+
+        function updateStudentUI(isActive) {
+            const badge = document.getElementById('class-status-badge');
+            const btn = document.getElementById('btn-join-class');
+
+            if (isActive) {
+                badge.innerText = "🟢 کلاس در حال برگزاری است";
+                badge.className = "status-badge status-online";
+                btn.disabled = false;
+                btn.innerHTML = "🚀 ورود به کلاس آنلاین";
+            } else {
+                badge.innerText = "🔴 کلاس فعلا شروع نشده است";
+                badge.className = "status-badge status-offline";
+                btn.disabled = true;
+                btn.innerHTML = "🔒 ورود به کلاس آنلاین";
+            }
+        }
+
+        function joinClass() {
+            window.open('https://meet.google.com/pty-ojxr-cco', '_blank');
+        }
+
+        // ----------------------------------------
+        // منطق مدیریت کاربران (ادمین)
+        // ----------------------------------------
         async function addUser(role) {
             let name, username, password;
 
@@ -302,23 +375,22 @@
             });
         }
 
+        // ----------------------------------------
+        // منطق ورود (Login)
+        // ----------------------------------------
         async function loginUser() {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
 
-            // ورود ادمین
+            // ورود ادمین (خودت)
             if (username === 'admin' && password === 'parham2010') {
                 document.getElementById('login-password').value = '';
                 showView('view-admin-panel');
                 return;
             }
 
-            // ورود کاربران
-            const { data: users } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('username', username)
-                .eq('password', password);
+            // ورود کاربران از دیتابیس
+            const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
             
             if (users && users.length > 0) {
                 const user = users[0];
@@ -326,10 +398,20 @@
 
                 if (user.role === 'teacher') {
                     document.getElementById('teacher-name-display').innerText = user.name;
+                    // چک کردن اینکه اگر کلاس از قبل استارت بوده، دکمه پایان رو نشون بده
+                    const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
+                    if(status && status.is_active) {
+                        document.getElementById('btn-start-class').classList.add('hidden');
+                        document.getElementById('btn-end-class').classList.remove('hidden');
+                    } else {
+                        document.getElementById('btn-start-class').classList.remove('hidden');
+                        document.getElementById('btn-end-class').classList.add('hidden');
+                    }
                     showView('view-teacher-panel');
                 } else {
                     document.getElementById('student-name-display').innerText = user.name;
                     showView('view-student-panel');
+                    checkStudentClassStatus();
                 }
             } else {
                 alert('نام کاربری یا رمز عبور اشتباه است!');
