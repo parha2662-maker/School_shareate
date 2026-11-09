@@ -48,33 +48,32 @@
         <div id="view-main">
             <h1>مدرسه شریعتی</h1>
             <p>به سامانه آموزشی هوشمند خوش آمدید</p>
-            <button class="btn-main" onclick="showView('view-login')">ورود به سامانه</button>
+            <button class="btn-green" onclick="showView('view-student-entry')">ورود دانش‌آموز</button>
+            <button class="btn-purple" onclick="showView('view-teacher-login')">ورود معلم (مدیر)</button>
         </div>
 
-        <div id="view-login" class="hidden">
-            <h1>ورود به سامانه</h1>
-            <input type="text" id="login-username" placeholder="نام کاربری (آیدی)">
+        <div id="view-student-entry" class="hidden">
+            <h1 style="color:#10b981;">ورود دانش‌آموز</h1>
+            <p>لطفاً نام خود را وارد کنید</p>
+            <input type="text" id="student-name-input" placeholder="مثلا علی">
+            <button class="btn-green" onclick="studentEnter()">ورود به پنل</button>
+            <span class="back-link" onclick="showView('view-main')">بازگشت</span>
+        </div>
+
+        <div id="view-teacher-login" class="hidden">
+            <h1 style="color:#8b5cf6;">ورود معلم</h1>
+            <input type="text" id="login-username" placeholder="آیدی معلم">
             <input type="password" id="login-password" placeholder="رمز عبور">
-            <button class="btn-main" onclick="loginUser()">ورود</button>
-            <span class="back-link" onclick="showView('view-main')">بازگشت به صفحه اصلی</span>
+            <button class="btn-purple" onclick="loginTeacher()">ورود</button>
+            <span class="back-link" onclick="showView('view-main')">بازگشت</span>
         </div>
 
         <div id="view-admin-panel" class="hidden">
             <h2>پنل مدیریت</h2>
-            <button class="btn-green" onclick="showView('view-add-student')">➕ افزودن دانش‌آموز</button>
-            <button class="btn-purple" onclick="showView('view-add-teacher')">➕ افزودن معلم</button>
-            <p style="margin-top: 25px; margin-bottom: 10px; text-align: right;">لیست کاربران:</p>
+            <button class="btn-purple" onclick="showView('view-add-teacher')">➕ افزودن معلم جدید</button>
+            <p style="margin-top: 25px; margin-bottom: 10px; text-align: right;">لیست معلم‌ها:</p>
             <div class="user-list" id="user-list-container"></div>
             <button class="btn-red" style="margin-top: 20px;" onclick="logout()">خروج</button>
-        </div>
-
-        <div id="view-add-student" class="hidden">
-            <h2 style="color:#10b981;">افزودن دانش‌آموز</h2>
-            <input type="text" id="student-name" placeholder="نام (مثلا علی)">
-            <input type="text" id="student-username" placeholder="آیدی (مثلا ali123)">
-            <input type="password" id="student-password" placeholder="رمز عبور">
-            <button class="btn-green" onclick="addUser('student')">ذخیره دانش‌آموز</button>
-            <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
         <div id="view-add-teacher" class="hidden">
@@ -82,7 +81,7 @@
             <input type="text" id="teacher-name" placeholder="نام معلم (مثلا استاد احمدی)">
             <input type="text" id="teacher-username" placeholder="آیدی معلم (مثلا ahmadi)">
             <input type="password" id="teacher-password" placeholder="رمز عبور">
-            <button class="btn-purple" onclick="addUser('teacher')">ذخیره معلم</button>
+            <button class="btn-purple" onclick="addTeacher()">ذخیره معلم</button>
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
@@ -109,13 +108,26 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let realtimeChannel = null;
-        // لینک جیتسی که هیچ ثبت‌نامی نمی‌خواد
-        const CLASS_LINK = 'https://meet.jit.si/parham-school-2026';
+        let currentStudentName = "";
+        let currentTeacherName = "";
+
+        // 🌟 تابع جادویی جیتسی: صفحه ورود اسم رو رد میکنه و اسم رو خودکار پر میکنه 🌟
+        function getJitsiLink(name) {
+            const room = 'parham-school-2026';
+            return `https://meet.jit.si/${room}#config.prejoinPageEnabled=false&userInfo.displayName="${encodeURIComponent(name)}"`;
+        }
+
+        window.onload = function() {
+            const savedName = localStorage.getItem('studentName');
+            if (savedName) {
+                document.getElementById('student-name-input').value = savedName;
+            }
+        };
 
         function showView(viewId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
-            if (viewId === 'view-admin-panel') loadUsers();
+            if (viewId === 'view-admin-panel') loadTeachers();
         }
 
         function logout() {
@@ -123,20 +135,20 @@
             showView('view-main');
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
+            currentStudentName = "";
+            currentTeacherName = "";
         }
 
-        async function startClass() {
-            await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
-            document.getElementById('btn-start-class').classList.add('hidden');
-            document.getElementById('btn-end-class').classList.remove('hidden');
-            window.open(CLASS_LINK, '_blank');
-        }
-
-        async function endClass() {
-            await supabaseClient.from('class_status').update({ is_active: false }).eq('id', 'main_class');
-            document.getElementById('btn-start-class').classList.remove('hidden');
-            document.getElementById('btn-end-class').classList.add('hidden');
-            alert('کلاس پایان یافت. وضعیت برای دانش‌آموزان قفل شد.');
+        function studentEnter() {
+            const name = document.getElementById('student-name-input').value;
+            if (!name) return alert('لطفاً نام خود را وارد کنید');
+            
+            currentStudentName = name;
+            localStorage.setItem('studentName', name);
+            
+            document.getElementById('student-name-display').innerText = name;
+            showView('view-student-panel');
+            checkStudentClassStatus();
         }
 
         async function checkStudentClassStatus() {
@@ -168,89 +180,84 @@
         }
 
         function joinClass() {
-            window.open(CLASS_LINK, '_blank');
+            window.open(getJitsiLink(currentStudentName), '_blank');
         }
 
-        async function addUser(role) {
-            let name, username, password;
+        async function startClass() {
+            await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
+            document.getElementById('btn-start-class').classList.add('hidden');
+            document.getElementById('btn-end-class').classList.remove('hidden');
+            window.open(getJitsiLink(currentTeacherName), '_blank');
+        }
 
-            if (role === 'student') {
-                name = document.getElementById('student-name').value;
-                username = document.getElementById('student-username').value;
-                password = document.getElementById('student-password').value;
-            } else {
-                name = document.getElementById('teacher-name').value;
-                username = document.getElementById('teacher-username').value;
-                password = document.getElementById('teacher-password').value;
-            }
+        async function endClass() {
+            await supabaseClient.from('class_status').update({ is_active: false }).eq('id', 'main_class');
+            document.getElementById('btn-start-class').classList.remove('hidden');
+            document.getElementById('btn-end-class').classList.add('hidden');
+            alert('کلاس پایان یافت. وضعیت برای دانش‌آموزان قفل شد.');
+        }
+
+        async function addTeacher() {
+            const name = document.getElementById('teacher-name').value;
+            const username = document.getElementById('teacher-username').value;
+            const password = document.getElementById('teacher-password').value;
 
             if(!name || !username || !password) return alert('لطفاً همه فیلدها را پر کنید');
 
-            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role }]);
+            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role: 'teacher' }]);
             
             if (error) {
                 alert(error.code === '23505' ? 'این آیدی قبلا ثبت شده است!' : 'خطا: ' + error.message);
             } else {
-                alert(role === 'student' ? 'دانش‌آموز با موفقیت ذخیره شد!' : 'معلم با موفقیت ذخیره شد!');
-                if (role === 'student') {
-                    document.getElementById('student-name').value = '';
-                    document.getElementById('student-username').value = '';
-                    document.getElementById('student-password').value = '';
-                } else {
-                    document.getElementById('teacher-name').value = '';
-                    document.getElementById('teacher-username').value = '';
-                    document.getElementById('teacher-password').value = '';
-                }
+                alert('معلم با موفقیت ذخیره شد!');
+                document.getElementById('teacher-name').value = '';
+                document.getElementById('teacher-username').value = '';
+                document.getElementById('teacher-password').value = '';
                 showView('view-admin-panel');
             }
         }
 
-        async function loadUsers() {
+        async function loadTeachers() {
             const container = document.getElementById('user-list-container');
             container.innerHTML = 'در حال دریافت...';
-            const { data: users, error } = await supabaseClient.from('users').select('*');
+            const { data: users, error } = await supabaseClient.from('users').select('*').eq('role', 'teacher');
             container.innerHTML = '';
-            if (error || users.length === 0) return container.innerHTML = 'هیچ کاربری ثبت نشده است.';
+            if (error || users.length === 0) return container.innerHTML = 'هیچ معلمی ثبت نشده است.';
             users.forEach(u => {
-                const color = u.role === 'teacher' ? '#8b5cf6' : '#10b981';
-                const roleName = u.role === 'teacher' ? 'معلم' : 'دانش‌آموز';
-                container.innerHTML += `<div class="user-item"><span>${u.name} <small style="color:${color}; margin-right: 5px;">(${roleName})</small></span><span style="color: #60a5fa; font-family: sans-serif;">${u.username}</span></div>`;
+                container.innerHTML += `<div class="user-item"><span>${u.name}</span><span style="color: #8b5cf6; font-family: sans-serif;">${u.username}</span></div>`;
             });
         }
 
-        async function loginUser() {
+        async function loginTeacher() {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
 
             if (username === 'admin' && password === 'parham2010') {
                 document.getElementById('login-password').value = '';
+                currentTeacherName = "مدیر";
                 showView('view-admin-panel');
                 return;
             }
 
-            const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
+            const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password).eq('role', 'teacher');
             
             if (users && users.length > 0) {
                 const user = users[0];
                 document.getElementById('login-password').value = ''; 
-                if (user.role === 'teacher') {
-                    document.getElementById('teacher-name-display').innerText = user.name;
-                    const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
-                    if(status && status.is_active) {
-                        document.getElementById('btn-start-class').classList.add('hidden');
-                        document.getElementById('btn-end-class').classList.remove('hidden');
-                    } else {
-                        document.getElementById('btn-start-class').classList.remove('hidden');
-                        document.getElementById('btn-end-class').classList.add('hidden');
-                    }
-                    showView('view-teacher-panel');
+                currentTeacherName = user.name;
+                document.getElementById('teacher-name-display').innerText = user.name;
+                
+                const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
+                if(status && status.is_active) {
+                    document.getElementById('btn-start-class').classList.add('hidden');
+                    document.getElementById('btn-end-class').classList.remove('hidden');
                 } else {
-                    document.getElementById('student-name-display').innerText = user.name;
-                    showView('view-student-panel');
-                    checkStudentClassStatus();
+                    document.getElementById('btn-start-class').classList.remove('hidden');
+                    document.getElementById('btn-end-class').classList.add('hidden');
                 }
+                showView('view-teacher-panel');
             } else {
-                alert('نام کاربری یا رمز عبور اشتباه است!');
+                alert('آیدی یا رمز عبور اشتباه است!');
             }
         }
     </script>
