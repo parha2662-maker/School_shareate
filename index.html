@@ -8,30 +8,89 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
-        body { background: #09090b; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; overflow: hidden; position: relative; }
         
+        body { 
+            background: #09090b; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #fff; 
+            overflow-x: hidden;
+            position: relative; 
+        }
+        
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; animation: float 8s infinite alternate ease-in-out; }
         .orb-1 { width: 300px; height: 300px; background: rgba(59, 130, 246, 0.4); top: -10%; left: -10%; }
         .orb-2 { width: 250px; height: 250px; background: rgba(139, 92, 246, 0.4); bottom: -10%; right: -10%; animation-delay: -4s; }
         .orb-3 { width: 200px; height: 200px; background: rgba(16, 185, 129, 0.3); top: 40%; left: 60%; animation-delay: -2s; }
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
         
-        .container { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); border-radius: 24px; padding: 30px 20px; max-width: 450px; width: 95%; box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); text-align: center; z-index: 10; position: relative; max-height: 90vh; overflow-y: auto; }
+        .container { 
+            background: rgba(20, 20, 25, 0.6); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-top: 1px solid rgba(255, 255, 255, 0.2); 
+            border-left: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 24px; 
+            padding: 30px 20px; 
+            max-width: 420px; 
+            width: calc(100% - 30px);
+            margin: 15px auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); 
+            text-align: center; 
+            z-index: 10; 
+            position: relative; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
         
         .hidden { display: none !important; }
         h1 { font-size: 26px; margin-bottom: 15px; font-weight: 900; background: linear-gradient(135deg, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 15px rgba(96, 165, 250, 0.4); }
-        h2 { font-size: 20px; margin-bottom: 20px; color: #f8fafc; }
+        h2 { font-size: 20px; margin-bottom: 20px; color: #f8fafc; text-align: center; }
         h3 { font-size: 16px; margin-bottom: 10px; color: #cbd5e1; text-align: right; }
-        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; text-align: center; }
         
-        input[type="text"], input[type="password"], input[type="number"], select { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; font-size: 14px; outline: none; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); }
+        input[type="text"], input[type="password"], input[type="number"], select, input[type="file"] { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 12px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(0,0,0,0.4); 
+            color: white; 
+            font-size: 14px; 
+            outline: none; 
+            transition: 0.3s; 
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); 
+            text-align: right;
+        }
+        input[type="file"] { padding: 10px; cursor: pointer; }
         input:focus, select:focus { border-color: #60a5fa; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(96, 165, 250, 0.3); }
         
         .checkbox-group { text-align: right; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .checkbox-group label { display: block; margin-bottom: 10px; cursor: pointer; font-size: 15px; }
         .checkbox-group input[type="checkbox"] { margin-left: 10px; transform: scale(1.3); cursor: pointer; }
 
-        button { width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.1s ease; position: relative; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translateY(-3px); }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: none; 
+            font-size: 15px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-bottom: 12px; 
+            transition: all 0.1s ease; 
+            position: relative; 
+            color: white; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3); 
+            transform: translateY(-3px); 
+        }
         button:active { transform: translateY(2px); }
         button:disabled { background: #334155 !important; color: #94a3b8; box-shadow: 0 4px 0 #1e293b !important; cursor: not-allowed; transform: translateY(0); text-shadow: none; }
         
@@ -47,15 +106,30 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
         
         .user-list, .exam-list { text-align: right; margin-top: 15px; max-height: 200px; overflow-y: auto; }
-        .user-item, .exam-item { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; border: 1px solid rgba(255,255,255,0.05); }
-        .exam-item { cursor: pointer; transition: 0.2s; }
+        
+        .user-item, .exam-item { 
+            background: rgba(255,255,255,0.05); 
+            padding: 10px 15px; 
+            border-radius: 10px; 
+            margin-bottom: 10px; 
+            font-size: 14px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #60a5fa; background: #333; }
+        .avatar-default { width: 40px; height: 40px; border-radius: 50%; background: #334155; display: flex; justify-content: center; align-items: center; color: #94a3b8; font-size: 18px; font-weight: bold; border: 2px solid #475569; }
+        
+        .exam-item { cursor: pointer; transition: 0.2s; display: block; }
         .exam-item:hover { background: rgba(255,255,255,0.1); }
         .exam-item h4 { color: #60a5fa; margin-bottom: 5px; font-size: 15px; }
         
-        .back-link { color: #94a3b8; font-size: 13px; cursor: pointer; display: block; margin-top: 15px; text-decoration: underline; }
+        .back-link { color: #94a3b8; font-size: 13px; cursor: pointer; display: block; margin-top: 15px; text-decoration: underline; text-align: center; }
         .error-msg { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; text-align: center; }
         
-        .timer-box { font-size: 20px; font-weight: bold; color: #f59e0b; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; direction: ltr; }
+        .timer-box { font-size: 20px; font-weight: bold; color: #f59e0b; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; direction: ltr; text-align: center; }
         .question-text { font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: #e2e8f0; text-align: right; }
         
         .radio-group { text-align: right; margin-bottom: 20px; }
@@ -63,15 +137,17 @@
         .radio-group label { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 6px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1); transform: translateY(-3px); }
         .radio-group label:active { transform: translateY(2px); box-shadow: 0 0 0 rgba(0,0,0,0.4), inset 0 2px 5px rgba(0,0,0,0.6); }
         .radio-group label:has(input[type="radio"]:checked) { background: linear-gradient(145deg, rgba(37,99,235,0.2), rgba(29,78,216,0.3)); border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.3), inset 0 2px 5px rgba(0,0,0,0.5); transform: translateY(2px); }
-        .radio-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #475569; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; background: rgba(0,0,0,0.3); }
+        .radio-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #475569; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; background: rgba(0,0,0,0.3); flex-shrink: 0; }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle { border-color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.5); }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
         
-        /* استایل جعبه ساخت سوال */
         .question-builder-box { background: rgba(0,0,0,0.2); border: 1px dashed #60a5fa; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
         .question-builder-box h4 { color: #60a5fa; margin-bottom: 10px; font-size: 14px; text-align: right; }
         .q-action-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .q-action-buttons button { margin-bottom: 0; padding: 10px; font-size: 13px; }
+
+        .profile-header { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
+        .profile-header img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #8b5cf6; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -95,7 +171,6 @@
             <span class="back-link" onclick="showView('view-main')">بازگشت</span>
         </div>
 
-        <!-- پنل مدیریت -->
         <div id="view-admin-panel" class="hidden">
             <h2>پنل مدیریت</h2>
             <button class="btn-green" onclick="showView('view-add-student')">➕ افزودن دانش‌آموز</button>
@@ -105,7 +180,6 @@
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- فرم دانش‌آموز -->
         <div id="view-add-student" class="hidden">
             <h2 style="color:#10b981;">افزودن دانش‌آموز</h2>
             <input type="text" id="student-name" placeholder="نام (مثلا علی)">
@@ -117,11 +191,12 @@
                 <option value="یازدهم">پایه یازدهم</option>
                 <option value="دوازدهم">پایه دوازدهم</option>
             </select>
+            <h3 style="font-size:13px; color:#cbd5e1; margin-bottom:5px;">عکس پروفایل (اختیاری):</h3>
+            <input type="file" id="student-avatar" accept="image/*">
             <button class="btn-green" onclick="addUser('student')">ذخیره</button>
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
-        <!-- فرم معلم -->
         <div id="view-add-teacher" class="hidden">
             <h2 style="color:#8b5cf6;">افزودن معلم</h2>
             <input type="text" id="teacher-name" placeholder="نام معلم">
@@ -133,18 +208,23 @@
                 <label><input type="checkbox" class="teacher-grade-cb" value="یازدهم"> پایه یازدهم</label>
                 <label><input type="checkbox" class="teacher-grade-cb" value="دوازدهم"> پایه دوازدهم</label>
             </div>
+            <h3 style="font-size:13px; color:#cbd5e1; margin-bottom:5px;">عکس پروفایل (اختیاری):</h3>
+            <input type="file" id="teacher-avatar" accept="image/*">
             <button class="btn-purple" onclick="addUser('teacher')">ذخیره</button>
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
-        <!-- پنل معلم -->
         <div id="view-teacher-panel" class="hidden">
-            <h2>پنل معلم</h2>
-            <p style="text-align:right; margin-bottom:15px; color: #8b5cf6; font-size: 13px;">استاد <span id="teacher-name-display" style="font-weight:bold;"></span></p>
+            <div class="profile-header">
+                <div>
+                    <span style="color:#8b5cf6; font-weight:bold; display:block; text-align:right;" id="teacher-name-display"></span>
+                    <small style="color:#94a3b8;">پنل معلم</small>
+                </div>
+                <img id="teacher-avatar-display" src="" style="display:none;">
+            </div>
             
             <div id="teacher-start-section">
                 <select id="teacher-grade-select" style="border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); margin-bottom: 15px;">
-                    <!-- گزینه ها با جاوا اسکریپت پر میشن -->
                 </select>
                 <button id="btn-start-class" class="btn-purple" onclick="startClass()">🚀 شروع کلاس آنلاین</button>
             </div>
@@ -156,11 +236,8 @@
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- 🌟 ایجاد آزمون (چند سوالی و پایه‌بندی شده) 🌟 -->
         <div id="view-create-exam" class="hidden">
             <h2>ایجاد آزمون</h2>
-            
-            <!-- اطلاعات کلی آزمون -->
             <input type="text" id="exam-title" placeholder="عنوان آزمون (مثلا میان‌ترم ریاضی)">
             <input type="number" id="exam-time" placeholder="زمان کل آزمون (دقیقه)" value="10">
             
@@ -173,11 +250,9 @@
 
             <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 20px;">
 
-            <!-- لیست سوالات اضافه شده -->
             <h3 style="font-size:14px; margin-bottom:10px; color:#cbd5e1;">لیست سوالات ثبت شده:</h3>
             <div id="questions-container"></div>
 
-            <!-- فرم افزودن/ویرایش سوال -->
             <div id="add-question-section" class="question-builder-box">
                 <h4 id="q-builder-title">افزودن سوال جدید</h4>
                 <input type="text" id="new-q-text" placeholder="متن سوال">
@@ -193,7 +268,6 @@
                 </select>
                 <input type="number" id="new-q-points" placeholder="بارم این سوال (نمره)" value="1">
                 
-                <!-- دکمه‌های عملیات سوال -->
                 <div class="q-action-buttons">
                     <button class="btn-green" onclick="saveQuestionToTemp()" id="btn-save-q">➕ ثبت سوال</button>
                     <button class="btn-main" onclick="prevQuestion()" id="btn-prev-q" disabled>سوال قبلی ⬅️</button>
@@ -215,10 +289,15 @@
             <span class="back-link" onclick="showView('view-teacher-panel')">بازگشت</span>
         </div>
 
-        <!-- پنل دانش‌آموز -->
         <div id="view-student-panel" class="hidden">
-            <h2>پنل دانش‌آموز</h2>
-            <p style="text-align:right; margin-bottom:10px; color: #10b981; font-size: 13px;">خوش آمدی <span id="student-name-display" style="font-weight:bold;"></span> 👋 (پایه: <span id="student-grade-display"></span>)</p>
+            <div class="profile-header">
+                <div>
+                    <span style="color:#10b981; font-weight:bold; display:block; text-align:right;" id="student-name-display"></span>
+                    <small style="color:#94a3b8;">پایه: <span id="student-grade-display"></span></small>
+                </div>
+                <img id="student-avatar-display" src="" style="display:none; border-color:#10b981;">
+                <div id="student-avatar-default" class="avatar-default" style="display:none;">👤</div>
+            </div>
             
             <div id="class-status-badge" class="status-badge status-offline">کلاس فعلا شروع نشده است</div>
             <button id="btn-join-class" class="btn-green" onclick="joinClass()" disabled>🔒 ورود به کلاس آنلاین</button>
@@ -227,14 +306,12 @@
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- لیست آزمون‌های دانش‌آموز -->
         <div id="view-student-exams" class="hidden">
             <h2>آزمون‌های فعال (مخصوص پایه شما)</h2>
             <div class="exam-list" id="student-exam-list"></div>
             <span class="back-link" onclick="showView('view-student-panel')">بازگشت</span>
         </div>
 
-        <!-- 🌟 صفحه دادن آزمون (تک سوالی) 🌟 -->
         <div id="view-take-exam" class="hidden">
             <h2 id="take-exam-title" style="color: #f59e0b; margin-bottom: 10px;">عنوان آزمون</h2>
             <div id="exam-timer" class="timer-box">00:00</div>
@@ -260,12 +337,11 @@
         let currentUsername = "";
         let currentUserRole = "";
         let currentUserGrade = "";
+        let currentUserAvatar = "";
 
-        // متغیرهای آزمون معلم
         let tempQuestions = []; 
-        let currentEditingIndex = -1; // -1 یعنی در حال ساخت سوال جدید
+        let currentEditingIndex = -1;
 
-        // متغیرهای آزمون دانش‌آموز
         let activeExam = null;
         let activeQuestions = [];
         let currentQIndex = 0;
@@ -291,7 +367,7 @@
             if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
             if (examTimerInterval) clearInterval(examTimerInterval);
             showView('view-main');
-            currentUserName = ""; currentUsername = ""; currentUserRole = ""; currentUserGrade = "";
+            currentUserName = ""; currentUsername = ""; currentUserRole = ""; currentUserGrade = ""; currentUserAvatar = "";
         }
 
         function showError(msg) {
@@ -300,9 +376,6 @@
             errorDiv.classList.remove('hidden');
         }
 
-        // ==========================================
-        // بخش ورود و لاگین
-        // ==========================================
         async function loginUser() {
             const userVal = document.getElementById('login-username').value.trim();
             const passVal = document.getElementById('login-password').value.trim();
@@ -326,10 +399,19 @@
             currentUsername = user.username;
             currentUserRole = user.role;
             currentUserGrade = user.grade || "";
+            currentUserAvatar = user.avatar_url || "";
 
             if (user.role === 'teacher') {
                 document.getElementById('teacher-name-display').innerText = user.name;
                 
+                const tAvatar = document.getElementById('teacher-avatar-display');
+                if (currentUserAvatar) {
+                    tAvatar.src = currentUserAvatar;
+                    tAvatar.style.display = 'block';
+                } else {
+                    tAvatar.style.display = 'none';
+                }
+
                 const gradeSelect = document.getElementById('teacher-grade-select');
                 gradeSelect.innerHTML = '<option value="">انتخاب پایه برای شروع...</option>';
                 const gradesToShow = currentUserGrade ? currentUserGrade.split(',') : ['دهم', 'یازدهم', 'دوازدهم'];
@@ -351,14 +433,23 @@
             } else {
                 document.getElementById('student-name-display').innerText = user.name;
                 document.getElementById('student-grade-display').innerText = currentUserGrade;
+                
+                const sAvatar = document.getElementById('student-avatar-display');
+                const sAvatarDef = document.getElementById('student-avatar-default');
+                if (currentUserAvatar) {
+                    sAvatar.src = currentUserAvatar;
+                    sAvatar.style.display = 'block';
+                    sAvatarDef.style.display = 'none';
+                } else {
+                    sAvatar.style.display = 'none';
+                    sAvatarDef.style.display = 'flex';
+                }
+
                 showView('view-student-panel');
                 checkStudentClassStatus();
             }
         }
 
-        // ==========================================
-        // بخش کلاس آنلاین
-        // ==========================================
         async function startClass() {
             const selectedGrade = document.getElementById('teacher-grade-select').value;
             if(!selectedGrade) return alert('لطفاً ابتدا پایه‌ای که می‌خواهید تدریس کنید را انتخاب کنید.');
@@ -412,17 +503,15 @@
             window.open(getJitsiLink(currentUserName, currentUserGrade), '_blank'); 
         }
 
-        // ==========================================
-        // مدیریت کاربران (ادمین)
-        // ==========================================
         async function addUser(role) {
-            let name, username, password, grade;
+            let name, username, password, grade, fileInput;
             
             if (role === 'student') {
                 name = document.getElementById('student-name').value;
                 username = document.getElementById('student-username').value;
                 password = document.getElementById('student-password').value;
                 grade = document.getElementById('student-grade').value;
+                fileInput = document.getElementById('student-avatar');
             } else {
                 name = document.getElementById('teacher-name').value;
                 username = document.getElementById('teacher-username').value;
@@ -430,11 +519,34 @@
                 const checkboxes = document.querySelectorAll('.teacher-grade-cb:checked');
                 const gradesArray = Array.from(checkboxes).map(cb => cb.value);
                 grade = gradesArray.join(',');
+                fileInput = document.getElementById('teacher-avatar');
             }
 
             if(!name || !username || !password || !grade) return alert('لطفاً همه فیلدها را پر کنید');
 
-            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role, grade }]);
+            let avatarUrl = null;
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${username}_${Date.now()}.${fileExt}`;
+                
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('avatars')
+                    .upload(fileName, file);
+                
+                if (uploadError) {
+                    return alert('خطا در آپلود عکس: ' + uploadError.message);
+                }
+
+                const { data: urlData } = supabaseClient.storage
+                    .from('avatars')
+                    .getPublicUrl(fileName);
+                
+                avatarUrl = urlData.publicUrl;
+            }
+
+            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role, grade, avatar_url: avatarUrl }]);
             
             if (error) {
                 alert(error.code === '23505' ? 'این آیدی قبلا ثبت شده است!' : 'خطا: ' + error.message);
@@ -444,11 +556,13 @@
                     document.getElementById('student-name').value = '';
                     document.getElementById('student-username').value = '';
                     document.getElementById('student-password').value = '';
+                    fileInput.value = '';
                 } else {
                     document.getElementById('teacher-name').value = '';
                     document.getElementById('teacher-username').value = '';
                     document.getElementById('teacher-password').value = '';
                     document.querySelectorAll('.teacher-grade-cb').forEach(cb => cb.checked = false);
+                    fileInput.value = '';
                 }
                 showView('view-admin-panel');
             }
@@ -462,13 +576,25 @@
             users.forEach(u => {
                 const roleName = u.role === 'teacher' ? 'معلم' : 'دانش‌آموز';
                 const color = u.role === 'teacher' ? '#8b5cf6' : '#10b981';
-                container.innerHTML += `<div class="user-item"><span>${u.name} <small style="color:${color}">(${roleName} - ${u.grade || 'نامشخص'})</small></span><span style="color: #60a5fa;">${u.username}</span></div>`;
+                
+                let avatarHtml = '';
+                if (u.avatar_url) {
+                    avatarHtml = `<img src="${u.avatar_url}" class="avatar">`;
+                } else {
+                    avatarHtml = `<div class="avatar-default">👤</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            ${avatarHtml}
+                            <span>${u.name} <small style="color:${color}">(${roleName} - ${u.grade || 'نامشخص'})</small></span>
+                        </div>
+                        <span style="color: #60a5fa; font-family: sans-serif;">${u.username}</span>
+                    </div>`;
             });
         }
 
-        // ==========================================
-        // بخش ساخت آزمون چند سوالی (معلم)
-        // ==========================================
         function resetCreateExamForm() {
             tempQuestions = [];
             currentEditingIndex = -1;
@@ -520,16 +646,13 @@
             const qData = { qText, opt1, opt2, opt3, opt4, correct, points };
 
             if (currentEditingIndex === -1) {
-                // سوال جدید
                 tempQuestions.push(qData);
-                currentEditingIndex = tempQuestions.length; // میره برای سوال بعدی (که خالیه)
+                currentEditingIndex = tempQuestions.length; 
             } else {
-                // ویرایش سوال قبلی
                 tempQuestions[currentEditingIndex] = qData;
-                currentEditingIndex++; // میره برای سوال بعدی
+                currentEditingIndex++; 
             }
 
-            // اگه از آخر رد شد، برمیگرده به حالت سوال جدید
             if (currentEditingIndex >= tempQuestions.length) {
                 currentEditingIndex = -1;
                 clearQuestionForm();
@@ -560,17 +683,15 @@
         }
 
         function nextQuestion() {
-            // اول اگه چیزی توی فرم هست، ذخیره کن
             if(document.getElementById('new-q-text').value) {
                 saveQuestionToTemp();
             }
             
             if (currentEditingIndex === -1) {
-                // یعنی الان توی حالت سوال جدید هستیم، کاری نکن
+                // در حال ساخت سوال جدید
             } else if (currentEditingIndex < tempQuestions.length - 1) {
                 editTempQuestion(currentEditingIndex + 1);
             } else {
-                // اگه سوال بعدی نبود، فرم خالی برای سوال جدید بیار
                 currentEditingIndex = -1;
                 clearQuestionForm();
                 updateBuilderUI();
@@ -581,7 +702,6 @@
             if (currentEditingIndex > 0) {
                 editTempQuestion(currentEditingIndex - 1);
             } else {
-                // اگه سوال جدید بود و برگشت عقب، بره آخرین سوال
                 if (tempQuestions.length > 0) {
                     editTempQuestion(tempQuestions.length - 1);
                 }
@@ -665,21 +785,33 @@
                 return;
             }
 
+            const { data: allUsers } = await supabaseClient.from('users').select('username, avatar_url');
+            const userMap = {};
+            allUsers.forEach(u => userMap[u.username] = u.avatar_url);
+
             results.forEach(r => {
+                let avatarHtml = '';
+                const sAvatar = userMap[r.student_username];
+                if (sAvatar) {
+                    avatarHtml = `<img src="${sAvatar}" class="avatar" style="width:30px; height:30px;">`;
+                } else {
+                    avatarHtml = `<div class="avatar-default" style="width:30px; height:30px; font-size:12px;">👤</div>`;
+                }
+
                 container.innerHTML += `
                     <div class="exam-item" style="border-right: 3px solid #f59e0b;">
                         <h4>${r.exam_title}</h4>
-                        <div style="display:flex; justify-content:space-between; margin-top:5px;">
-                            <span>${r.student_name} (${r.student_username})</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                            <div class="user-info">
+                                ${avatarHtml}
+                                <span>${r.student_name} (${r.student_username})</span>
+                            </div>
                             <span style="color: #10b981; font-weight: bold;">نمره: ${r.score} از ${r.max_score}</span>
                         </div>
                     </div>`;
             });
         }
 
-        // ==========================================
-        // بخش آزمون (دانش‌آموز)
-        // ==========================================
         async function loadStudentExams() {
             const container = document.getElementById('student-exam-list');
             container.innerHTML = 'در حال دریافت...';
