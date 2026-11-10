@@ -37,6 +37,24 @@
         .user-item { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .back-link { color: #94a3b8; font-size: 13px; cursor: pointer; display: block; margin-top: 15px; text-decoration: none; transition: 0.3s; }
         .back-link:hover { color: #fff; }
+
+        /* 🌟 استایل پیام خطای اختصاصی 🌟 */
+        .error-msg {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
@@ -45,16 +63,20 @@
     <div class="orb orb-3"></div>
 
     <div class="container">
-        <!-- صفحه اول (دقیقاً مثل عکس خودت) -->
+        <!-- صفحه اول -->
         <div id="view-main">
             <h1>مدرسه شریعتی</h1>
             <p>به سامانه آموزشی هوشمند خوش آمدید</p>
             <button class="btn-main" onclick="showView('view-login')">ورود به سامانه</button>
         </div>
 
-        <!-- صفحه لاگین (فقط آیدی و رمز) -->
+        <!-- صفحه لاگین -->
         <div id="view-login" class="hidden">
             <h1>ورود به سامانه</h1>
+            
+            <!-- کادر نمایش خطا (اولش مخفی است) -->
+            <div id="login-error" class="error-msg hidden"></div>
+
             <input type="text" id="login-username" placeholder="آیدی">
             <input type="password" id="login-password" placeholder="رمز عبور">
             <button class="btn-main" onclick="loginUser()">ورود</button>
@@ -119,7 +141,6 @@
         let realtimeChannel = null;
         let currentUserName = "";
 
-        // 🌟 تابع جادویی جیتسی: صفحه ورود اسم رو رد میکنه و اسم رو خودکار پر میکنه 🌟
         function getJitsiLink(name) {
             const room = 'parham-school-2026';
             return `https://meet.jit.si/${room}#config.prejoinPageEnabled=false&userInfo.displayName="${encodeURIComponent(name)}"`;
@@ -129,57 +150,81 @@
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
             if (viewId === 'view-admin-panel') loadUsers();
+            
+            // پاک کردن خطا هنگام تغییر صفحه
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
         }
 
         function logout() {
             if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
             showView('view-main');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
             currentUserName = "";
         }
 
-        // 🌟 منطق ورود (بدون سریع، فقط آیدی و رمز) 🌟
+        // 🌟 تابع نمایش خطای اختصاصی 🌟
+        function showError(msg) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.innerText = msg;
+            errorDiv.classList.remove('hidden');
+        }
+
+        // 🌟 منطق جدید ورود (تشخیص خطای نام کاربری و رمز) 🌟
         async function loginUser() {
             const userVal = document.getElementById('login-username').value.trim();
             const passVal = document.getElementById('login-password').value.trim();
+            const errorDiv = document.getElementById('login-error');
 
-            if(!userVal || !passVal) return alert('لطفاً آیدی و رمز عبور را وارد کنید');
+            errorDiv.classList.add('hidden'); // مخفی کردن خطای قبلی
 
-            // 1. اگر ادمین باشد
+            if(!userVal || !passVal) {
+                showError('لطفاً آیدی و رمز عبور را وارد کنید.');
+                return;
+            }
+
+            // 1. بررسی ادمین
             if (userVal === 'admin' && passVal === 'parham2010') {
-                document.getElementById('login-password').value = '';
                 showView('view-admin-panel');
                 return;
             }
 
-            // 2. چک کردن دیتابیس (معلم یا دانش‌آموز)
-            const { data: users } = await supabaseClient.from('users').select('*').eq('username', userVal).eq('password', passVal);
-            
-            if (users && users.length > 0) {
-                const user = users[0];
-                document.getElementById('login-password').value = '';
-                document.getElementById('login-username').value = '';
-                currentUserName = user.name;
+            // 2. چک کردن اینکه اصلا کاربری با این آیدی وجود دارد یا نه
+            const { data: users, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', userVal);
 
-                if (user.role === 'teacher') {
-                    document.getElementById('teacher-name-display').innerText = user.name;
-                    const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
-                    if(status && status.is_active) {
-                        document.getElementById('btn-start-class').classList.add('hidden');
-                        document.getElementById('btn-end-class').classList.remove('hidden');
-                    } else {
-                        document.getElementById('btn-start-class').classList.remove('hidden');
-                        document.getElementById('btn-end-class').classList.add('hidden');
-                    }
-                    showView('view-teacher-panel');
+            if (!users || users.length === 0) {
+                showError('کاربری با این نام کاربری یافت نشد.');
+                return;
+            }
+
+            // 3. کاربر وجود دارد، حالا رمز را چک می‌کنیم
+            const user = users[0];
+            if (user.password !== passVal) {
+                showError('رمز عبور اشتباه است.');
+                return;
+            }
+
+            // 4. ورود موفق
+            currentUserName = user.name;
+
+            if (user.role === 'teacher') {
+                document.getElementById('teacher-name-display').innerText = user.name;
+                const { data: status } = await supabaseClient.from('class_status').select('is_active').eq('id', 'main_class').single();
+                if(status && status.is_active) {
+                    document.getElementById('btn-start-class').classList.add('hidden');
+                    document.getElementById('btn-end-class').classList.remove('hidden');
                 } else {
-                    document.getElementById('student-name-display').innerText = user.name;
-                    showView('view-student-panel');
-                    checkStudentClassStatus();
+                    document.getElementById('btn-start-class').classList.remove('hidden');
+                    document.getElementById('btn-end-class').classList.add('hidden');
                 }
+                showView('view-teacher-panel');
             } else {
-                alert('آیدی یا رمز عبور اشتباه است!');
+                document.getElementById('student-name-display').innerText = user.name;
+                showView('view-student-panel');
+                checkStudentClassStatus();
             }
         }
 
@@ -197,7 +242,6 @@
             await supabaseClient.from('class_status').update({ is_active: false }).eq('id', 'main_class');
             document.getElementById('btn-start-class').classList.remove('hidden');
             document.getElementById('btn-end-class').classList.add('hidden');
-            alert('کلاس پایان یافت. وضعیت برای دانش‌آموزان قفل شد.');
         }
 
         async function checkStudentClassStatus() {
