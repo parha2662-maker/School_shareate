@@ -9,23 +9,29 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; }
         
+        html, body { 
+            width: 100%;
+            overflow-x: hidden; /* جلوگیری از اسکرول افقی و کج شدن */
+            background: #09090b;
+        }
+
         body { 
-            background: #09090b; 
             min-height: 100vh; 
             display: flex; 
-            justify-content: center; 
+            flex-direction: column; 
             align-items: center; 
+            justify-content: center;
             color: #fff; 
-            overflow-x: hidden;
             position: relative; 
+            padding: 20px 0;
         }
         
         ::-webkit-scrollbar { display: none; }
         body { -ms-overflow-style: none; scrollbar-width: none; }
 
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; animation: float 8s infinite alternate ease-in-out; }
-        .orb-1 { width: 300px; height: 300px; background: rgba(59, 130, 246, 0.4); top: -10%; left: -10%; }
-        .orb-2 { width: 250px; height: 250px; background: rgba(139, 92, 246, 0.4); bottom: -10%; right: -10%; animation-delay: -4s; }
+        .orb-1 { width: 300px; height: 300px; background: rgba(59, 130, 246, 0.4); top: -5%; left: -5%; }
+        .orb-2 { width: 250px; height: 250px; background: rgba(139, 92, 246, 0.4); bottom: -5%; right: -5%; animation-delay: -4s; }
         .orb-3 { width: 200px; height: 200px; background: rgba(16, 185, 129, 0.3); top: 40%; left: 60%; animation-delay: -2s; }
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
         
@@ -39,8 +45,8 @@
             border-radius: 24px; 
             padding: 30px 20px; 
             max-width: 420px; 
-            width: calc(100% - 30px);
-            margin: 15px auto;
+            width: 92%; /* عرض دقیق */
+            margin: 0 auto; /* همیشه وسط */
             box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); 
             text-align: center; 
             z-index: 10; 
@@ -141,8 +147,10 @@
         .radio-group label:has(input[type="radio"]:checked) .radio-circle { border-color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.5); }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
         
-        .question-builder-box { background: rgba(0,0,0,0.2); border: 1px dashed #60a5fa; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .question-builder-box { background: rgba(0,0,0,0.2); border: 1px dashed #60a5fa; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; transition: 0.3s; }
+        .question-builder-box.active-q { border: 2px solid #60a5fa; background: rgba(59,130,246,0.1); }
         .question-builder-box h4 { color: #60a5fa; margin-bottom: 10px; font-size: 14px; text-align: right; }
+        
         .q-action-buttons { display: flex; gap: 10px; margin-top: 10px; }
         .q-action-buttons button { margin-bottom: 0; padding: 10px; font-size: 13px; }
 
@@ -253,7 +261,7 @@
             <h3 style="font-size:14px; margin-bottom:10px; color:#cbd5e1;">لیست سوالات ثبت شده:</h3>
             <div id="questions-container"></div>
 
-            <div id="add-question-section" class="question-builder-box">
+            <div id="add-question-section" class="question-builder-box active-q">
                 <h4 id="q-builder-title">افزودن سوال جدید</h4>
                 <input type="text" id="new-q-text" placeholder="متن سوال">
                 <input type="text" id="new-opt1" placeholder="گزینه ۱">
@@ -269,8 +277,8 @@
                 <input type="number" id="new-q-points" placeholder="بارم این سوال (نمره)" value="1">
                 
                 <div class="q-action-buttons">
-                    <button class="btn-green" onclick="saveQuestionToTemp()" id="btn-save-q">➕ ثبت سوال</button>
                     <button class="btn-main" onclick="prevQuestion()" id="btn-prev-q" disabled>سوال قبلی ⬅️</button>
+                    <button class="btn-green" onclick="saveQuestionToTemp()" id="btn-save-q">➕ ثبت سوال</button>
                     <button class="btn-main" onclick="nextQuestion()" id="btn-next-q">سوال بعدی ➡️</button>
                 </div>
             </div>
@@ -626,10 +634,10 @@
                 btnSave.innerText = "➕ ثبت سوال";
             } else {
                 title.innerText = `ویرایش سوال ${currentEditingIndex + 1}`;
-                btnSave.innerText = "✅ ذخیره تغییرات سوال";
+                btnSave.innerText = "✅ ذخیره تغییرات";
             }
 
-            btnPrev.disabled = (currentEditingIndex <= 0);
+            btnPrev.disabled = (currentEditingIndex === 0);
         }
 
         function saveQuestionToTemp() {
@@ -647,27 +655,52 @@
 
             if (currentEditingIndex === -1) {
                 tempQuestions.push(qData);
-                currentEditingIndex = tempQuestions.length; 
+                currentEditingIndex = tempQuestions.length - 1;
             } else {
                 tempQuestions[currentEditingIndex] = qData;
-                currentEditingIndex++; 
-            }
-
-            if (currentEditingIndex >= tempQuestions.length) {
-                currentEditingIndex = -1;
-                clearQuestionForm();
-            } else {
-                loadQuestionToForm(currentEditingIndex);
             }
 
             renderTempQuestions();
             updateBuilderUI();
+            alert('سوال ثبت شد. برای سوال بعدی روی دکمه آبی کلیک کنید.');
+        }
+
+        function nextQuestion() {
+            if(document.getElementById('new-q-text').value.trim() !== '') {
+                saveQuestionToTemp();
+            }
+
+            if (currentEditingIndex === -1) return; 
+
+            if (currentEditingIndex < tempQuestions.length - 1) {
+                currentEditingIndex++;
+                loadQuestionToForm(currentEditingIndex);
+            } else {
+                currentEditingIndex = -1;
+                clearQuestionForm();
+                updateBuilderUI();
+            }
+        }
+
+        function prevQuestion() {
+            if(document.getElementById('new-q-text').value.trim() !== '') {
+                saveQuestionToTemp();
+            }
+
+            if (currentEditingIndex === -1) {
+                if (tempQuestions.length > 0) {
+                    currentEditingIndex = tempQuestions.length - 1;
+                    loadQuestionToForm(currentEditingIndex);
+                }
+            } else if (currentEditingIndex > 0) {
+                currentEditingIndex--;
+                loadQuestionToForm(currentEditingIndex);
+            }
         }
 
         function editTempQuestion(index) {
             currentEditingIndex = index;
             loadQuestionToForm(index);
-            updateBuilderUI();
         }
 
         function loadQuestionToForm(index) {
@@ -679,33 +712,9 @@
             document.getElementById('new-opt4').value = q.opt4;
             document.getElementById('new-correct').value = q.correct;
             document.getElementById('new-q-points').value = q.points;
-            document.getElementById('add-question-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function nextQuestion() {
-            if(document.getElementById('new-q-text').value) {
-                saveQuestionToTemp();
-            }
             
-            if (currentEditingIndex === -1) {
-                // در حال ساخت سوال جدید
-            } else if (currentEditingIndex < tempQuestions.length - 1) {
-                editTempQuestion(currentEditingIndex + 1);
-            } else {
-                currentEditingIndex = -1;
-                clearQuestionForm();
-                updateBuilderUI();
-            }
-        }
-
-        function prevQuestion() {
-            if (currentEditingIndex > 0) {
-                editTempQuestion(currentEditingIndex - 1);
-            } else {
-                if (tempQuestions.length > 0) {
-                    editTempQuestion(tempQuestions.length - 1);
-                }
-            }
+            updateBuilderUI();
+            document.getElementById('add-question-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function renderTempQuestions() {
@@ -715,13 +724,17 @@
 
             tempQuestions.forEach((q, index) => {
                 total += q.points;
+                const isEditing = (index === currentEditingIndex);
+                const borderColor = isEditing ? '#60a5fa' : '#10b981';
+                const bgColor = isEditing ? 'rgba(59,130,246,0.15)' : 'rgba(0,0,0,0.2)';
+                
                 container.innerHTML += `
-                    <div class="question-builder-box" style="border-color: #10b981; cursor: pointer;" onclick="editTempQuestion(${index})">
+                    <div class="question-builder-box" style="border-color: ${borderColor}; background: ${bgColor}; cursor: pointer;" onclick="editTempQuestion(${index})">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h4 style="margin:0;">سوال ${index + 1} (بارم: ${q.points})</h4>
-                            <span style="color:#10b981; font-size:12px;">👈 برای ویرایش کلیک کنید</span>
+                            <button class="btn-red" style="width:auto; padding: 5px 10px; font-size:12px; margin:0; transform:none;" onclick="event.stopPropagation(); removeTempQuestion(${index})">حذف</button>
                         </div>
-                        <p style="color:white; margin-top:5px; margin-bottom:0; text-align:right;">${q.qText}</p>
+                        <p style="color:white; margin-top:10px; margin-bottom:0; text-align:right;">${q.qText}</p>
                     </div>
                 `;
             });
@@ -731,10 +744,14 @@
 
         function removeTempQuestion(index) {
             tempQuestions.splice(index, 1);
-            if (currentEditingIndex >= tempQuestions.length) currentEditingIndex = -1;
+            if (currentEditingIndex === index) {
+                currentEditingIndex = -1;
+                clearQuestionForm();
+            } else if (currentEditingIndex > index) {
+                currentEditingIndex--;
+            }
             renderTempQuestions();
             updateBuilderUI();
-            clearQuestionForm();
         }
 
         async function saveFullExam() {
