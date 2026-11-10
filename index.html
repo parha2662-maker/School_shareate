@@ -16,7 +16,7 @@
         .orb-3 { width: 200px; height: 200px; background: rgba(16, 185, 129, 0.3); top: 40%; left: 60%; animation-delay: -2s; }
         @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
         
-        .container { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); border-radius: 24px; padding: 30px 20px; max-width: 420px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); text-align: center; z-index: 10; position: relative; max-height: 90vh; overflow-y: auto; }
+        .container { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); border-radius: 24px; padding: 30px 20px; max-width: 450px; width: 95%; box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1); text-align: center; z-index: 10; position: relative; max-height: 90vh; overflow-y: auto; }
         
         .hidden { display: none !important; }
         h1 { font-size: 26px; margin-bottom: 15px; font-weight: 900; background: linear-gradient(135deg, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 15px rgba(96, 165, 250, 0.4); }
@@ -27,7 +27,6 @@
         input[type="text"], input[type="password"], input[type="number"], select { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); color: white; font-size: 14px; outline: none; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); }
         input:focus, select:focus { border-color: #60a5fa; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(96, 165, 250, 0.3); }
         
-        /* استایل چک باکس ها برای معلم */
         .checkbox-group { text-align: right; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .checkbox-group label { display: block; margin-bottom: 10px; cursor: pointer; font-size: 15px; }
         .checkbox-group input[type="checkbox"] { margin-left: 10px; transform: scale(1.3); cursor: pointer; }
@@ -67,6 +66,9 @@
         .radio-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #475569; display: flex; justify-content: center; align-items: center; transition: all 0.2s ease; background: rgba(0,0,0,0.3); }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle { border-color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.5); }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
+        
+        .question-builder-box { background: rgba(0,0,0,0.2); border: 1px dashed #60a5fa; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .question-builder-box h4 { color: #60a5fa; margin-bottom: 10px; font-size: 14px; text-align: right; }
     </style>
 </head>
 <body>
@@ -100,7 +102,7 @@
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- فرم دانش‌آموز (منوی کشویی پایه) -->
+        <!-- فرم دانش‌آموز -->
         <div id="view-add-student" class="hidden">
             <h2 style="color:#10b981;">افزودن دانش‌آموز</h2>
             <input type="text" id="student-name" placeholder="نام (مثلا علی)">
@@ -116,20 +118,18 @@
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
-        <!-- فرم معلم (چک باکس پایه‌ها) -->
+        <!-- فرم معلم -->
         <div id="view-add-teacher" class="hidden">
             <h2 style="color:#8b5cf6;">افزودن معلم</h2>
             <input type="text" id="teacher-name" placeholder="نام معلم">
             <input type="text" id="teacher-username" placeholder="آیدی معلم">
             <input type="password" id="teacher-password" placeholder="رمز عبور">
-            
             <h3 style="font-size:14px; margin-bottom:10px; color:#cbd5e1;">پایه‌هایی که این معلم تدریس می‌کند:</h3>
             <div class="checkbox-group">
                 <label><input type="checkbox" class="teacher-grade-cb" value="دهم"> پایه دهم</label>
                 <label><input type="checkbox" class="teacher-grade-cb" value="یازدهم"> پایه یازدهم</label>
                 <label><input type="checkbox" class="teacher-grade-cb" value="دوازدهم"> پایه دوازدهم</label>
             </div>
-
             <button class="btn-purple" onclick="addUser('teacher')">ذخیره</button>
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
@@ -141,40 +141,61 @@
             
             <div id="teacher-start-section">
                 <select id="teacher-grade-select" style="border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); margin-bottom: 15px;">
-                    <option value="">انتخاب پایه برای شروع...</option>
+                    <!-- گزینه ها با جاوا اسکریپت پر میشن -->
                 </select>
                 <button id="btn-start-class" class="btn-purple" onclick="startClass()">🚀 شروع کلاس آنلاین</button>
             </div>
             
             <button id="btn-end-class" class="btn-red hidden" onclick="endClass()">⛔️ پایان کلاس</button>
-            <button class="btn-orange" onclick="showView('view-create-exam')">📝 ایجاد آزمون جدید</button>
+            <button class="btn-orange" onclick="resetCreateExamForm(); showView('view-create-exam')">📝 ایجاد آزمون جدید</button>
             <button class="btn-main" onclick="loadTeacherResults()">📊 مشاهده نمرات</button>
             
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- فرم آزمون -->
+        <!-- 🌟 ایجاد آزمون (چند سوالی و پایه‌بندی شده) 🌟 -->
         <div id="view-create-exam" class="hidden">
             <h2>ایجاد آزمون</h2>
-            <input type="text" id="exam-title" placeholder="عنوان آزمون">
-            <input type="text" id="exam-q" placeholder="متن سوال">
-            <input type="text" id="exam-opt1" placeholder="گزینه ۱">
-            <input type="text" id="exam-opt2" placeholder="گزینه ۲">
-            <input type="text" id="exam-opt3" placeholder="گزینه ۳">
-            <input type="text" id="exam-opt4" placeholder="گزینه ۴">
             
-            <h3>گزینه صحیح:</h3>
-            <select id="exam-correct">
-                <option value="1">گزینه ۱</option>
-                <option value="2">گزینه ۲</option>
-                <option value="3">گزینه ۳</option>
-                <option value="4">گزینه ۴</option>
-            </select>
+            <!-- اطلاعات کلی آزمون -->
+            <input type="text" id="exam-title" placeholder="عنوان آزمون (مثلا میان‌ترم ریاضی)">
+            <input type="number" id="exam-time" placeholder="زمان کل آزمون (دقیقه)" value="10">
             
-            <input type="number" id="exam-time" placeholder="زمان (دقیقه)" value="5">
-            <input type="number" id="exam-points" placeholder="بارم" value="20">
-            
-            <button class="btn-orange" onclick="createExam()">ثبت آزمون</button>
+            <h3 style="font-size:14px; margin-bottom:10px; color:#cbd5e1;">این آزمون برای کدام پایه‌ها فعال باشد؟</h3>
+            <div class="checkbox-group" style="margin-bottom:20px;">
+                <label><input type="checkbox" class="exam-target-grade" value="دهم"> پایه دهم</label>
+                <label><input type="checkbox" class="exam-target-grade" value="یازدهم"> پایه یازدهم</label>
+                <label><input type="checkbox" class="exam-target-grade" value="دوازدهم"> پایه دوازدهم</label>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 20px;">
+
+            <!-- لیست سوالات اضافه شده -->
+            <div id="questions-container"></div>
+
+            <!-- فرم افزودن سوال جدید -->
+            <div id="add-question-section" class="question-builder-box">
+                <h4>افزودن سوال جدید</h4>
+                <input type="text" id="new-q-text" placeholder="متن سوال">
+                <input type="text" id="new-opt1" placeholder="گزینه ۱">
+                <input type="text" id="new-opt2" placeholder="گزینه ۲">
+                <input type="text" id="new-opt3" placeholder="گزینه ۳">
+                <input type="text" id="new-opt4" placeholder="گزینه ۴">
+                <select id="new-correct">
+                    <option value="1">گزینه صحیح: ۱</option>
+                    <option value="2">گزینه صحیح: ۲</option>
+                    <option value="3">گزینه صحیح: ۳</option>
+                    <option value="4">گزینه صحیح: ۴</option>
+                </select>
+                <input type="number" id="new-q-points" placeholder="بارم این سوال (نمره)" value="1">
+                <button class="btn-green" onclick="addQuestionToTemp()">➕ ثبت این سوال در آزمون</button>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+                <span style="color: #10b981; font-weight: bold;">جمع کل نمرات: <span id="total-points-display">0</span> نمره</span>
+            </div>
+
+            <button class="btn-orange" onclick="saveFullExam()">✅ ذخیره نهایی آزمون</button>
             <span class="back-link" onclick="showView('view-teacher-panel')">بازگشت</span>
         </div>
 
@@ -196,18 +217,26 @@
             <button class="btn-red" style="margin-top: 15px;" onclick="logout()">خروج</button>
         </div>
 
+        <!-- لیست آزمون‌های دانش‌آموز -->
         <div id="view-student-exams" class="hidden">
-            <h2>آزمون‌های فعال</h2>
+            <h2>آزمون‌های فعال (مخصوص پایه شما)</h2>
             <div class="exam-list" id="student-exam-list"></div>
             <span class="back-link" onclick="showView('view-student-panel')">بازگشت</span>
         </div>
 
+        <!-- 🌟 صفحه دادن آزمون (تک سوالی) 🌟 -->
         <div id="view-take-exam" class="hidden">
             <h2 id="take-exam-title" style="color: #f59e0b; margin-bottom: 10px;">عنوان آزمون</h2>
             <div id="exam-timer" class="timer-box">00:00</div>
+            
+            <div style="text-align: right; color: #94a3b8; font-size: 13px; margin-bottom: 5px;">
+                سوال <span id="current-q-index-display">1</span> از <span id="total-q-display">1</span>
+            </div>
+            
             <div id="take-exam-q" class="question-text">متن سوال...</div>
             <div class="radio-group" id="exam-options-container"></div>
-            <button class="btn-green" onclick="submitExam()">ارسال پاسخ</button>
+            
+            <button class="btn-green" id="btn-next-q" onclick="nextQuestion()">ثبت پاسخ و سوال بعدی</button>
         </div>
     </div>
 
@@ -222,7 +251,14 @@
         let currentUserRole = "";
         let currentUserGrade = "";
 
+        // متغیرهای آزمون معلم
+        let tempQuestions = []; // سوالاتی که معلم داره میسازه
+
+        // متغیرهای آزمون دانش‌آموز
         let activeExam = null;
+        let activeQuestions = [];
+        let currentQIndex = 0;
+        let studentAnswers = {};
         let examTimerInterval = null;
         let timeRemaining = 0;
 
@@ -253,6 +289,9 @@
             errorDiv.classList.remove('hidden');
         }
 
+        // ==========================================
+        // بخش ورود
+        // ==========================================
         async function loginUser() {
             const userVal = document.getElementById('login-username').value.trim();
             const passVal = document.getElementById('login-password').value.trim();
@@ -280,16 +319,15 @@
             if (user.role === 'teacher') {
                 document.getElementById('teacher-name-display').innerText = user.name;
                 
-                // پر کردن منوی کشویی پایه‌ها برای معلم (حالا ممکنه چند پایه باشه)
+                // 🌟 رفع باگ: اگر معلم پایه نداشت، همه پایه‌ها رو نشون بده
                 const gradeSelect = document.getElementById('teacher-grade-select');
                 gradeSelect.innerHTML = '<option value="">انتخاب پایه برای شروع...</option>';
-                if (currentUserGrade) {
-                    currentUserGrade.split(',').forEach(g => {
-                        const opt = document.createElement('option');
-                        opt.value = g.trim(); opt.innerText = g.trim();
-                        gradeSelect.appendChild(opt);
-                    });
-                }
+                const gradesToShow = currentUserGrade ? currentUserGrade.split(',') : ['دهم', 'یازدهم', 'دوازدهم'];
+                gradesToShow.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g.trim(); opt.innerText = g.trim();
+                    gradeSelect.appendChild(opt);
+                });
 
                 const { data: status } = await supabaseClient.from('class_status').select('*').eq('id', 'main_class').single();
                 if(status && status.is_active) {
@@ -308,6 +346,9 @@
             }
         }
 
+        // ==========================================
+        // بخش کلاس آنلاین
+        // ==========================================
         async function startClass() {
             const selectedGrade = document.getElementById('teacher-grade-select').value;
             if(!selectedGrade) return alert('لطفاً ابتدا پایه‌ای که می‌خواهید تدریس کنید را انتخاب کنید.');
@@ -327,9 +368,7 @@
 
         async function checkStudentClassStatus() {
             const { data } = await supabaseClient.from('class_status').select('*').eq('id', 'main_class').single();
-            
             const isMyClassActive = data && data.is_active && (data.active_grade === currentUserGrade);
-
             updateStudentUI(isMyClassActive, data ? data.active_grade : null);
 
             realtimeChannel = supabaseClient.channel('class_status_changes').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'class_status' }, payload => {
@@ -363,7 +402,9 @@
             window.open(getJitsiLink(currentUserName, currentUserGrade), '_blank'); 
         }
 
-        // 🌟 تابع افزودن کاربر (با منطق جدید برای دکمه‌های تیک و منوی کشویی)
+        // ==========================================
+        // مدیریت کاربران (ادمین)
+        // ==========================================
         async function addUser(role) {
             let name, username, password, grade;
             
@@ -371,16 +412,14 @@
                 name = document.getElementById('student-name').value;
                 username = document.getElementById('student-username').value;
                 password = document.getElementById('student-password').value;
-                grade = document.getElementById('student-grade').value; // از منوی کشویی
+                grade = document.getElementById('student-grade').value;
             } else {
                 name = document.getElementById('teacher-name').value;
                 username = document.getElementById('teacher-username').value;
                 password = document.getElementById('teacher-password').value;
-                
-                // گرفتن پایه‌های تیک خورده برای معلم
                 const checkboxes = document.querySelectorAll('.teacher-grade-cb:checked');
                 const gradesArray = Array.from(checkboxes).map(cb => cb.value);
-                grade = gradesArray.join(','); // تبدیل به رشته با کاما (مثلا: "دهم,یازدهم")
+                grade = gradesArray.join(',');
             }
 
             if(!name || !username || !password || !grade) return alert('لطفاً همه فیلدها را پر کنید');
@@ -391,8 +430,6 @@
                 alert(error.code === '23505' ? 'این آیدی قبلا ثبت شده است!' : 'خطا: ' + error.message);
             } else {
                 alert(role === 'student' ? 'دانش‌آموز ذخیره شد!' : 'معلم ذخیره شد!');
-                
-                // خالی کردن فرم‌ها
                 if(role === 'student') {
                     document.getElementById('student-name').value = '';
                     document.getElementById('student-username').value = '';
@@ -403,7 +440,6 @@
                     document.getElementById('teacher-password').value = '';
                     document.querySelectorAll('.teacher-grade-cb').forEach(cb => cb.checked = false);
                 }
-                
                 showView('view-admin-panel');
             }
         }
@@ -420,28 +456,113 @@
             });
         }
 
-        // ---------------- بخش آزمون‌ها ----------------
-        async function createExam() {
+        // ==========================================
+        // بخش ساخت آزمون چند سوالی (معلم)
+        // ==========================================
+        function resetCreateExamForm() {
+            tempQuestions = [];
+            document.getElementById('exam-title').value = '';
+            document.getElementById('exam-time').value = '10';
+            document.querySelectorAll('.exam-target-grade').forEach(cb => cb.checked = false);
+            document.getElementById('questions-container').innerHTML = '';
+            document.getElementById('total-points-display').innerText = '0';
+            clearQuestionForm();
+        }
+
+        function clearQuestionForm() {
+            document.getElementById('new-q-text').value = '';
+            document.getElementById('new-opt1').value = '';
+            document.getElementById('new-opt2').value = '';
+            document.getElementById('new-opt3').value = '';
+            document.getElementById('new-opt4').value = '';
+            document.getElementById('new-correct').value = '1';
+            document.getElementById('new-q-points').value = '1';
+        }
+
+        function addQuestionToTemp() {
+            const qText = document.getElementById('new-q-text').value;
+            const opt1 = document.getElementById('new-opt1').value;
+            const opt2 = document.getElementById('new-opt2').value;
+            const opt3 = document.getElementById('new-opt3').value;
+            const opt4 = document.getElementById('new-opt4').value;
+            const correct = parseInt(document.getElementById('new-correct').value);
+            const points = parseInt(document.getElementById('new-q-points').value);
+
+            if(!qText || !opt1 || !opt2 || !opt3 || !opt4) return alert('لطفاً متن سوال و ۴ گزینه را پر کنید');
+
+            tempQuestions.push({ qText, opt1, opt2, opt3, opt4, correct, points });
+            renderTempQuestions();
+            clearQuestionForm();
+        }
+
+        function renderTempQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            let total = 0;
+
+            tempQuestions.forEach((q, index) => {
+                total += q.points;
+                container.innerHTML += `
+                    <div class="question-builder-box" style="border-color: #10b981;">
+                        <h4>سوال ${index + 1} (بارم: ${q.points})</h4>
+                        <p style="color:white; margin-bottom:5px; text-align:right;">${q.qText}</p>
+                        <button class="btn-red" style="padding: 5px; font-size: 12px; margin-bottom:0;" onclick="removeTempQuestion(${index})">حذف سوال</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('total-points-display').innerText = total;
+        }
+
+        function removeTempQuestion(index) {
+            tempQuestions.splice(index, 1);
+            renderTempQuestions();
+        }
+
+        async function saveFullExam() {
             const title = document.getElementById('exam-title').value;
-            const q = document.getElementById('exam-q').value;
-            const opt1 = document.getElementById('exam-opt1').value;
-            const opt2 = document.getElementById('exam-opt2').value;
-            const opt3 = document.getElementById('exam-opt3').value;
-            const opt4 = document.getElementById('exam-opt4').value;
-            const correct_opt = document.getElementById('exam-correct').value;
-            const time_limit = document.getElementById('exam-time').value;
-            const points = document.getElementById('exam-points').value;
+            const timeLimit = document.getElementById('exam-time').value;
+            
+            const checkboxes = document.querySelectorAll('.exam-target-grade:checked');
+            const targetGrades = Array.from(checkboxes).map(cb => cb.value).join(',');
 
-            if(!title || !q || !opt1 || !opt2 || !opt3 || !opt4) return alert('لطفاً همه فیلدها را پر کنید');
+            if(!title || !targetGrades || tempQuestions.length === 0) {
+                return alert('لطفاً عنوان آزمون، پایه‌های هدف و حداقل یک سوال را وارد کنید.');
+            }
 
-            const { error } = await supabaseClient.from('exams').insert([{
-                teacher_username: currentUsername, title, question: q, opt1, opt2, opt3, opt4, correct_opt: parseInt(correct_opt), time_limit: parseInt(time_limit), points: parseInt(points)
-            }]);
+            const totalMaxScore = tempQuestions.reduce((sum, q) => sum + q.points, 0);
 
-            if (error) {
-                alert('خطا در ساخت آزمون: ' + error.message);
+            // 1. ثبت آزمون اصلی
+            const { data: examData, error: examError } = await supabaseClient.from('exams').insert([{
+                teacher_username: currentUsername,
+                title: title,
+                time_limit: parseInt(timeLimit),
+                target_grades: targetGrades,
+                points: totalMaxScore // اینجا کل نمره آزمون رو ذخیره میکنیم
+            }]).select();
+
+            if (examError) return alert('خطا در ذخیره آزمون: ' + examError.message);
+
+            const newExamId = examData[0].id;
+
+            // 2. ثبت سوالات
+            const questionsToInsert = tempQuestions.map(q => ({
+                exam_id: newExamId,
+                q_text: q.qText,
+                opt1: q.opt1,
+                opt2: q.opt2,
+                opt3: q.opt3,
+                opt4: q.opt4,
+                correct_opt: q.correct,
+                points: q.points
+            }));
+
+            const { error: qError } = await supabaseClient.from('questions').insert(questionsToInsert);
+
+            if (qError) {
+                alert('خطا در ذخیره سوالات: ' + qError.message);
             } else {
-                alert('آزمون ایجاد شد و برای دانش‌آموزان قابل مشاهده است.');
+                alert('آزمون کامل با موفقیت ایجاد شد!');
                 showView('view-teacher-panel');
             }
         }
@@ -471,23 +592,30 @@
             });
         }
 
+        // ==========================================
+        // بخش آزمون (دانش‌آموز)
+        // ==========================================
         async function loadStudentExams() {
             const container = document.getElementById('student-exam-list');
             container.innerHTML = 'در حال دریافت...';
             showView('view-student-exams');
 
-            const { data: exams } = await supabaseClient.from('exams').select('*');
-            const { data: myResults } = await supabaseClient.from('exam_results').select('exam_id').eq('student_username', currentUsername);
+            // گرفتن آزمون‌هایی که پایه دانش‌آموز رو شامل میشن
+            const { data: allExams } = await supabaseClient.from('exams').select('*');
+            const myExams = allExams.filter(e => e.target_grades && e.target_grades.includes(currentUserGrade));
 
+            // گرفتن آزمون‌هایی که دانش‌آموز قبلا داده
+            const { data: myResults } = await supabaseClient.from('exam_results').select('exam_id').eq('student_username', currentUsername);
             const takenExamIds = myResults.map(r => r.exam_id);
+            
             container.innerHTML = '';
 
-            if (!exams || exams.length === 0) {
-                container.innerHTML = '<p style="text-align:center;">هیچ آزمونی وجود ندارد.</p>';
+            if (!myExams || myExams.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">هیچ آزمونی برای پایه شما وجود ندارد.</p>';
                 return;
             }
 
-            exams.forEach(e => {
+            myExams.forEach(e => {
                 const hasTaken = takenExamIds.includes(e.id);
                 if (hasTaken) {
                     container.innerHTML += `
@@ -497,37 +625,91 @@
                         </div>`;
                 } else {
                     container.innerHTML += `
-                        <div class="exam-item" onclick='startExam(${JSON.stringify(e)})'>
+                        <div class="exam-item" onclick='startExam(${e.id}, "${e.title}", ${e.time_limit})'>
                             <h4>${e.title}</h4>
-                            <p style="font-size:12px; margin:0;">بارم: ${e.points} نمره - زمان: ${e.time_limit} دقیقه</p>
+                            <p style="font-size:12px; margin:0;">نمره کل: ${e.points} - زمان: ${e.time_limit} دقیقه</p>
                         </div>`;
                 }
             });
         }
 
-        function startExam(exam) {
-            activeExam = exam;
-            timeRemaining = exam.time_limit * 60;
+        async function startExam(examId, examTitle, timeLimit) {
+            // گرفتن سوالات این آزمون از دیتابیس
+            const { data: qData } = await supabaseClient.from('questions').select('*').eq('exam_id', examId);
             
-            document.getElementById('take-exam-title').innerText = exam.title;
-            document.getElementById('take-exam-q').innerText = exam.question;
+            if (!qData || qData.length === 0) {
+                return alert('سوالی برای این آزمون یافت نشد!');
+            }
+
+            activeExam = { id: examId, title: examTitle, timeLimit: timeLimit };
+            activeQuestions = qData;
+            currentQIndex = 0;
+            studentAnswers = {};
+            timeRemaining = timeLimit * 60;
+
+            document.getElementById('take-exam-title').innerText = examTitle;
+            showView('view-take-exam');
             
+            renderCurrentQuestion();
+            startTimer();
+        }
+
+        function renderCurrentQuestion() {
+            const q = activeQuestions[currentQIndex];
+            
+            document.getElementById('current-q-index-display').innerText = currentQIndex + 1;
+            document.getElementById('total-q-display').innerText = activeQuestions.length;
+            document.getElementById('take-exam-q').innerText = q.q_text;
+
             const container = document.getElementById('exam-options-container');
             container.innerHTML = `
-                <label><span>${exam.opt1}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="1"></label>
-                <label><span>${exam.opt2}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="2"></label>
-                <label><span>${exam.opt3}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="3"></label>
-                <label><span>${exam.opt4}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="4"></label>
+                <label><span>${q.opt1}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="1" ${studentAnswers[q.id] === 1 ? 'checked' : ''}></label>
+                <label><span>${q.opt2}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="2" ${studentAnswers[q.id] === 2 ? 'checked' : ''}></label>
+                <label><span>${q.opt3}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="3" ${studentAnswers[q.id] === 3 ? 'checked' : ''}></label>
+                <label><span>${q.opt4}</span><div class="radio-circle"></div><input type="radio" name="exam_ans" value="4" ${studentAnswers[q.id] === 4 ? 'checked' : ''}></label>
             `;
 
-            showView('view-take-exam');
+            const btn = document.getElementById('btn-next-q');
+            if (currentQIndex === activeQuestions.length - 1) {
+                btn.innerText = "پایان آزمون و ثبت نمره";
+                btn.className = "btn-red";
+            } else {
+                btn.innerText = "ثبت پاسخ و سوال بعدی";
+                btn.className = "btn-green";
+            }
+        }
+
+        function nextQuestion() {
+            // ذخیره پاسخ فعلی
+            const radios = document.getElementsByName('exam_ans');
+            let selectedOpt = null;
+            for (let r of radios) { if (r.checked) selectedOpt = parseInt(r.value); }
+            
+            if (selectedOpt === null) {
+                return alert('لطفاً یک گزینه انتخاب کنید یا اگر نمی‌دانید به سوال بعد بروید.');
+            }
+
+            const q = activeQuestions[currentQIndex];
+            studentAnswers[q.id] = selectedOpt;
+
+            // برو به سوال بعدی
+            if (currentQIndex < activeQuestions.length - 1) {
+                currentQIndex++;
+                renderCurrentQuestion();
+            } else {
+                submitExam(false);
+            }
+        }
+
+        function startTimer() {
             updateTimerDisplay();
+            if (examTimerInterval) clearInterval(examTimerInterval);
             examTimerInterval = setInterval(() => {
                 timeRemaining--;
                 updateTimerDisplay();
                 if (timeRemaining <= 0) {
                     clearInterval(examTimerInterval);
-                    alert('زمان آزمون به پایان رسید!');
+                    alert('زمان آزمون به پایان رسید! پاسخ‌های شما ثبت شد.');
                     submitExam(true);
                 }
             }, 1000);
@@ -543,24 +725,39 @@
             if(!activeExam) return;
             if (examTimerInterval) clearInterval(examTimerInterval);
 
-            let selectedOpt = null;
-            const radios = document.getElementsByName('exam_ans');
-            for (let r of radios) { if (r.checked) selectedOpt = parseInt(r.value); }
-
-            if (selectedOpt === null && !autoSubmit) {
-                return alert('لطفاً یک گزینه را انتخاب کنید.');
+            // اگر خودش تموم شده، ممکنه سوال آخر جوابش ثبت نشده باشه
+            if (autoSubmit) {
+                const radios = document.getElementsByName('exam_ans');
+                let selectedOpt = null;
+                for (let r of radios) { if (r.checked) selectedOpt = parseInt(r.value); }
+                if (selectedOpt !== null) {
+                    studentAnswers[activeQuestions[currentQIndex].id] = selectedOpt;
+                }
             }
 
-            const score = (selectedOpt === activeExam.correct_opt) ? activeExam.points : 0;
+            // محاسبه نمره
+            let totalScore = 0;
+            let maxScore = 0;
+            activeQuestions.forEach(q => {
+                maxScore += q.points;
+                if (studentAnswers[q.id] === q.correct_opt) {
+                    totalScore += q.points;
+                }
+            });
 
             const { error } = await supabaseClient.from('exam_results').insert([{
-                exam_id: activeExam.id, exam_title: activeExam.title, student_username: currentUsername, student_name: currentUserName, score: score, max_score: activeExam.points
+                exam_id: activeExam.id, 
+                exam_title: activeExam.title, 
+                student_username: currentUsername, 
+                student_name: currentUserName, 
+                score: totalScore, 
+                max_score: maxScore
             }]);
 
             if (error) {
                 alert('خطا در ثبت نتیجه: ' + error.message);
             } else {
-                alert(`آزمون به پایان رسید. نمره شما: ${score} از ${activeExam.points}`);
+                alert(`آزمون به پایان رسید.\nنمره شما: ${totalScore} از ${maxScore}`);
                 loadStudentExams();
             }
             activeExam = null;
