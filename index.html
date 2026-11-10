@@ -67,8 +67,11 @@
         .radio-group label:has(input[type="radio"]:checked) .radio-circle { border-color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.5); }
         .radio-group label:has(input[type="radio"]:checked) .radio-circle::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: #60a5fa; box-shadow: 0 0 8px #60a5fa; }
         
+        /* استایل جعبه ساخت سوال */
         .question-builder-box { background: rgba(0,0,0,0.2); border: 1px dashed #60a5fa; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
         .question-builder-box h4 { color: #60a5fa; margin-bottom: 10px; font-size: 14px; text-align: right; }
+        .q-action-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .q-action-buttons button { margin-bottom: 0; padding: 10px; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -171,11 +174,12 @@
             <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 20px;">
 
             <!-- لیست سوالات اضافه شده -->
+            <h3 style="font-size:14px; margin-bottom:10px; color:#cbd5e1;">لیست سوالات ثبت شده:</h3>
             <div id="questions-container"></div>
 
-            <!-- فرم افزودن سوال جدید -->
+            <!-- فرم افزودن/ویرایش سوال -->
             <div id="add-question-section" class="question-builder-box">
-                <h4>افزودن سوال جدید</h4>
+                <h4 id="q-builder-title">افزودن سوال جدید</h4>
                 <input type="text" id="new-q-text" placeholder="متن سوال">
                 <input type="text" id="new-opt1" placeholder="گزینه ۱">
                 <input type="text" id="new-opt2" placeholder="گزینه ۲">
@@ -188,10 +192,16 @@
                     <option value="4">گزینه صحیح: ۴</option>
                 </select>
                 <input type="number" id="new-q-points" placeholder="بارم این سوال (نمره)" value="1">
-                <button class="btn-green" onclick="addQuestionToTemp()">➕ ثبت این سوال در آزمون</button>
+                
+                <!-- دکمه‌های عملیات سوال -->
+                <div class="q-action-buttons">
+                    <button class="btn-green" onclick="saveQuestionToTemp()" id="btn-save-q">➕ ثبت سوال</button>
+                    <button class="btn-main" onclick="prevQuestion()" id="btn-prev-q" disabled>سوال قبلی ⬅️</button>
+                    <button class="btn-main" onclick="nextQuestion()" id="btn-next-q">سوال بعدی ➡️</button>
+                </div>
             </div>
 
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 10px; margin-bottom: 15px; margin-top:20px;">
                 <span style="color: #10b981; font-weight: bold;">جمع کل نمرات: <span id="total-points-display">0</span> نمره</span>
             </div>
 
@@ -236,7 +246,7 @@
             <div id="take-exam-q" class="question-text">متن سوال...</div>
             <div class="radio-group" id="exam-options-container"></div>
             
-            <button class="btn-green" id="btn-next-q" onclick="nextQuestion()">ثبت پاسخ و سوال بعدی</button>
+            <button class="btn-green" id="btn-next-q" onclick="submitAnswerAndNext()">ثبت پاسخ و سوال بعدی</button>
         </div>
     </div>
 
@@ -252,7 +262,8 @@
         let currentUserGrade = "";
 
         // متغیرهای آزمون معلم
-        let tempQuestions = []; // سوالاتی که معلم داره میسازه
+        let tempQuestions = []; 
+        let currentEditingIndex = -1; // -1 یعنی در حال ساخت سوال جدید
 
         // متغیرهای آزمون دانش‌آموز
         let activeExam = null;
@@ -290,7 +301,7 @@
         }
 
         // ==========================================
-        // بخش ورود
+        // بخش ورود و لاگین
         // ==========================================
         async function loginUser() {
             const userVal = document.getElementById('login-username').value.trim();
@@ -319,7 +330,6 @@
             if (user.role === 'teacher') {
                 document.getElementById('teacher-name-display').innerText = user.name;
                 
-                // 🌟 رفع باگ: اگر معلم پایه نداشت، همه پایه‌ها رو نشون بده
                 const gradeSelect = document.getElementById('teacher-grade-select');
                 gradeSelect.innerHTML = '<option value="">انتخاب پایه برای شروع...</option>';
                 const gradesToShow = currentUserGrade ? currentUserGrade.split(',') : ['دهم', 'یازدهم', 'دوازدهم'];
@@ -461,12 +471,13 @@
         // ==========================================
         function resetCreateExamForm() {
             tempQuestions = [];
+            currentEditingIndex = -1;
             document.getElementById('exam-title').value = '';
             document.getElementById('exam-time').value = '10';
             document.querySelectorAll('.exam-target-grade').forEach(cb => cb.checked = false);
-            document.getElementById('questions-container').innerHTML = '';
-            document.getElementById('total-points-display').innerText = '0';
+            renderTempQuestions();
             clearQuestionForm();
+            updateBuilderUI();
         }
 
         function clearQuestionForm() {
@@ -479,7 +490,23 @@
             document.getElementById('new-q-points').value = '1';
         }
 
-        function addQuestionToTemp() {
+        function updateBuilderUI() {
+            const title = document.getElementById('q-builder-title');
+            const btnSave = document.getElementById('btn-save-q');
+            const btnPrev = document.getElementById('btn-prev-q');
+
+            if (currentEditingIndex === -1) {
+                title.innerText = "افزودن سوال جدید";
+                btnSave.innerText = "➕ ثبت سوال";
+            } else {
+                title.innerText = `ویرایش سوال ${currentEditingIndex + 1}`;
+                btnSave.innerText = "✅ ذخیره تغییرات سوال";
+            }
+
+            btnPrev.disabled = (currentEditingIndex <= 0);
+        }
+
+        function saveQuestionToTemp() {
             const qText = document.getElementById('new-q-text').value;
             const opt1 = document.getElementById('new-opt1').value;
             const opt2 = document.getElementById('new-opt2').value;
@@ -490,9 +517,75 @@
 
             if(!qText || !opt1 || !opt2 || !opt3 || !opt4) return alert('لطفاً متن سوال و ۴ گزینه را پر کنید');
 
-            tempQuestions.push({ qText, opt1, opt2, opt3, opt4, correct, points });
+            const qData = { qText, opt1, opt2, opt3, opt4, correct, points };
+
+            if (currentEditingIndex === -1) {
+                // سوال جدید
+                tempQuestions.push(qData);
+                currentEditingIndex = tempQuestions.length; // میره برای سوال بعدی (که خالیه)
+            } else {
+                // ویرایش سوال قبلی
+                tempQuestions[currentEditingIndex] = qData;
+                currentEditingIndex++; // میره برای سوال بعدی
+            }
+
+            // اگه از آخر رد شد، برمیگرده به حالت سوال جدید
+            if (currentEditingIndex >= tempQuestions.length) {
+                currentEditingIndex = -1;
+                clearQuestionForm();
+            } else {
+                loadQuestionToForm(currentEditingIndex);
+            }
+
             renderTempQuestions();
-            clearQuestionForm();
+            updateBuilderUI();
+        }
+
+        function editTempQuestion(index) {
+            currentEditingIndex = index;
+            loadQuestionToForm(index);
+            updateBuilderUI();
+        }
+
+        function loadQuestionToForm(index) {
+            const q = tempQuestions[index];
+            document.getElementById('new-q-text').value = q.qText;
+            document.getElementById('new-opt1').value = q.opt1;
+            document.getElementById('new-opt2').value = q.opt2;
+            document.getElementById('new-opt3').value = q.opt3;
+            document.getElementById('new-opt4').value = q.opt4;
+            document.getElementById('new-correct').value = q.correct;
+            document.getElementById('new-q-points').value = q.points;
+            document.getElementById('add-question-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function nextQuestion() {
+            // اول اگه چیزی توی فرم هست، ذخیره کن
+            if(document.getElementById('new-q-text').value) {
+                saveQuestionToTemp();
+            }
+            
+            if (currentEditingIndex === -1) {
+                // یعنی الان توی حالت سوال جدید هستیم، کاری نکن
+            } else if (currentEditingIndex < tempQuestions.length - 1) {
+                editTempQuestion(currentEditingIndex + 1);
+            } else {
+                // اگه سوال بعدی نبود، فرم خالی برای سوال جدید بیار
+                currentEditingIndex = -1;
+                clearQuestionForm();
+                updateBuilderUI();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentEditingIndex > 0) {
+                editTempQuestion(currentEditingIndex - 1);
+            } else {
+                // اگه سوال جدید بود و برگشت عقب، بره آخرین سوال
+                if (tempQuestions.length > 0) {
+                    editTempQuestion(tempQuestions.length - 1);
+                }
+            }
         }
 
         function renderTempQuestions() {
@@ -503,10 +596,12 @@
             tempQuestions.forEach((q, index) => {
                 total += q.points;
                 container.innerHTML += `
-                    <div class="question-builder-box" style="border-color: #10b981;">
-                        <h4>سوال ${index + 1} (بارم: ${q.points})</h4>
-                        <p style="color:white; margin-bottom:5px; text-align:right;">${q.qText}</p>
-                        <button class="btn-red" style="padding: 5px; font-size: 12px; margin-bottom:0;" onclick="removeTempQuestion(${index})">حذف سوال</button>
+                    <div class="question-builder-box" style="border-color: #10b981; cursor: pointer;" onclick="editTempQuestion(${index})">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h4 style="margin:0;">سوال ${index + 1} (بارم: ${q.points})</h4>
+                            <span style="color:#10b981; font-size:12px;">👈 برای ویرایش کلیک کنید</span>
+                        </div>
+                        <p style="color:white; margin-top:5px; margin-bottom:0; text-align:right;">${q.qText}</p>
                     </div>
                 `;
             });
@@ -516,7 +611,10 @@
 
         function removeTempQuestion(index) {
             tempQuestions.splice(index, 1);
+            if (currentEditingIndex >= tempQuestions.length) currentEditingIndex = -1;
             renderTempQuestions();
+            updateBuilderUI();
+            clearQuestionForm();
         }
 
         async function saveFullExam() {
@@ -532,29 +630,16 @@
 
             const totalMaxScore = tempQuestions.reduce((sum, q) => sum + q.points, 0);
 
-            // 1. ثبت آزمون اصلی
             const { data: examData, error: examError } = await supabaseClient.from('exams').insert([{
-                teacher_username: currentUsername,
-                title: title,
-                time_limit: parseInt(timeLimit),
-                target_grades: targetGrades,
-                points: totalMaxScore // اینجا کل نمره آزمون رو ذخیره میکنیم
+                teacher_username: currentUsername, title: title, time_limit: parseInt(timeLimit), target_grades: targetGrades, points: totalMaxScore
             }]).select();
 
             if (examError) return alert('خطا در ذخیره آزمون: ' + examError.message);
 
             const newExamId = examData[0].id;
 
-            // 2. ثبت سوالات
             const questionsToInsert = tempQuestions.map(q => ({
-                exam_id: newExamId,
-                q_text: q.qText,
-                opt1: q.opt1,
-                opt2: q.opt2,
-                opt3: q.opt3,
-                opt4: q.opt4,
-                correct_opt: q.correct,
-                points: q.points
+                exam_id: newExamId, q_text: q.qText, opt1: q.opt1, opt2: q.opt2, opt3: q.opt3, opt4: q.opt4, correct_opt: q.correct, points: q.points
             }));
 
             const { error: qError } = await supabaseClient.from('questions').insert(questionsToInsert);
@@ -600,11 +685,9 @@
             container.innerHTML = 'در حال دریافت...';
             showView('view-student-exams');
 
-            // گرفتن آزمون‌هایی که پایه دانش‌آموز رو شامل میشن
             const { data: allExams } = await supabaseClient.from('exams').select('*');
             const myExams = allExams.filter(e => e.target_grades && e.target_grades.includes(currentUserGrade));
 
-            // گرفتن آزمون‌هایی که دانش‌آموز قبلا داده
             const { data: myResults } = await supabaseClient.from('exam_results').select('exam_id').eq('student_username', currentUsername);
             const takenExamIds = myResults.map(r => r.exam_id);
             
@@ -634,7 +717,6 @@
         }
 
         async function startExam(examId, examTitle, timeLimit) {
-            // گرفتن سوالات این آزمون از دیتابیس
             const { data: qData } = await supabaseClient.from('questions').select('*').eq('exam_id', examId);
             
             if (!qData || qData.length === 0) {
@@ -679,20 +761,18 @@
             }
         }
 
-        function nextQuestion() {
-            // ذخیره پاسخ فعلی
+        function submitAnswerAndNext() {
             const radios = document.getElementsByName('exam_ans');
             let selectedOpt = null;
             for (let r of radios) { if (r.checked) selectedOpt = parseInt(r.value); }
             
             if (selectedOpt === null) {
-                return alert('لطفاً یک گزینه انتخاب کنید یا اگر نمی‌دانید به سوال بعد بروید.');
+                return alert('لطفاً یک گزینه انتخاب کنید.');
             }
 
             const q = activeQuestions[currentQIndex];
             studentAnswers[q.id] = selectedOpt;
 
-            // برو به سوال بعدی
             if (currentQIndex < activeQuestions.length - 1) {
                 currentQIndex++;
                 renderCurrentQuestion();
@@ -725,7 +805,6 @@
             if(!activeExam) return;
             if (examTimerInterval) clearInterval(examTimerInterval);
 
-            // اگر خودش تموم شده، ممکنه سوال آخر جوابش ثبت نشده باشه
             if (autoSubmit) {
                 const radios = document.getElementsByName('exam_ans');
                 let selectedOpt = null;
@@ -735,7 +814,6 @@
                 }
             }
 
-            // محاسبه نمره
             let totalScore = 0;
             let maxScore = 0;
             activeQuestions.forEach(q => {
@@ -746,12 +824,7 @@
             });
 
             const { error } = await supabaseClient.from('exam_results').insert([{
-                exam_id: activeExam.id, 
-                exam_title: activeExam.title, 
-                student_username: currentUsername, 
-                student_name: currentUserName, 
-                score: totalScore, 
-                max_score: maxScore
+                exam_id: activeExam.id, exam_title: activeExam.title, student_username: currentUsername, student_name: currentUserName, score: totalScore, max_score: maxScore
             }]);
 
             if (error) {
