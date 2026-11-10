@@ -45,38 +45,50 @@
     <div class="orb orb-3"></div>
 
     <div class="container">
-        <!-- صفحه اول دقیقا مثل عکس خودت (فقط یه دکمه آبی) -->
+        <!-- صفحه اول (دقیقاً مثل عکس خودت) -->
         <div id="view-main">
             <h1>مدرسه شریعتی</h1>
             <p>به سامانه آموزشی هوشمند خوش آمدید</p>
             <button class="btn-main" onclick="showView('view-login')">ورود به سامانه</button>
         </div>
 
-        <!-- صفحه لاگین بعد از زدن دکمه آبی -->
+        <!-- صفحه لاگین (فقط آیدی و رمز) -->
         <div id="view-login" class="hidden">
             <h1>ورود به سامانه</h1>
-            <input type="text" id="login-username" placeholder="آیدی (یا نام شما برای دانش‌آموز)">
-            <input type="password" id="login-password" placeholder="رمز عبور (برای معلم و مدیر)">
+            <input type="text" id="login-username" placeholder="آیدی">
+            <input type="password" id="login-password" placeholder="رمز عبور">
             <button class="btn-main" onclick="loginUser()">ورود</button>
-            <button class="btn-green" onclick="studentQuickEnter()" style="margin-top:10px;">ورود سریع دانش‌آموز (فقط با نام)</button>
-            <span class="back-link" onclick="showView('view-main')">بازگشت</span>
+            <span class="back-link" onclick="showView('view-main')">بازگشت به صفحه اصلی</span>
         </div>
 
         <!-- پنل مدیریت -->
         <div id="view-admin-panel" class="hidden">
             <h2>پنل مدیریت</h2>
-            <button class="btn-purple" onclick="showView('view-add-teacher')">➕ افزودن معلم جدید</button>
-            <p style="margin-top: 25px; margin-bottom: 10px; text-align: right;">لیست معلم‌ها:</p>
+            <button class="btn-green" onclick="showView('view-add-student')">➕ افزودن دانش‌آموز</button>
+            <button class="btn-purple" onclick="showView('view-add-teacher')">➕ افزودن معلم</button>
+            
+            <p style="margin-top: 25px; margin-bottom: 10px; text-align: right;">لیست کاربران ثبت‌شده:</p>
             <div class="user-list" id="user-list-container"></div>
             <button class="btn-red" style="margin-top: 20px;" onclick="logout()">خروج</button>
         </div>
 
+        <!-- فرم دانش‌آموز -->
+        <div id="view-add-student" class="hidden">
+            <h2 style="color:#10b981;">افزودن دانش‌آموز</h2>
+            <input type="text" id="student-name" placeholder="نام (مثلا علی)">
+            <input type="text" id="student-username" placeholder="آیدی (مثلا ali123)">
+            <input type="password" id="student-password" placeholder="رمز عبور">
+            <button class="btn-green" onclick="addUser('student')">ذخیره دانش‌آموز</button>
+            <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
+        </div>
+
+        <!-- فرم معلم -->
         <div id="view-add-teacher" class="hidden">
             <h2 style="color:#8b5cf6;">افزودن معلم</h2>
             <input type="text" id="teacher-name" placeholder="نام معلم (مثلا استاد احمدی)">
             <input type="text" id="teacher-username" placeholder="آیدی معلم (مثلا ahmadi)">
             <input type="password" id="teacher-password" placeholder="رمز عبور">
-            <button class="btn-purple" onclick="addTeacher()">ذخیره معلم</button>
+            <button class="btn-purple" onclick="addUser('teacher')">ذخیره معلم</button>
             <span class="back-link" onclick="showView('view-admin-panel')">بازگشت</span>
         </div>
 
@@ -107,6 +119,7 @@
         let realtimeChannel = null;
         let currentUserName = "";
 
+        // 🌟 تابع جادویی جیتسی: صفحه ورود اسم رو رد میکنه و اسم رو خودکار پر میکنه 🌟
         function getJitsiLink(name) {
             const room = 'parham-school-2026';
             return `https://meet.jit.si/${room}#config.prejoinPageEnabled=false&userInfo.displayName="${encodeURIComponent(name)}"`;
@@ -115,7 +128,7 @@
         function showView(viewId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
-            if (viewId === 'view-admin-panel') loadTeachers();
+            if (viewId === 'view-admin-panel') loadUsers();
         }
 
         function logout() {
@@ -126,21 +139,27 @@
             currentUserName = "";
         }
 
+        // 🌟 منطق ورود (بدون سریع، فقط آیدی و رمز) 🌟
         async function loginUser() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
+            const userVal = document.getElementById('login-username').value.trim();
+            const passVal = document.getElementById('login-password').value.trim();
 
-            if (username === 'admin' && password === 'parham2010') {
+            if(!userVal || !passVal) return alert('لطفاً آیدی و رمز عبور را وارد کنید');
+
+            // 1. اگر ادمین باشد
+            if (userVal === 'admin' && passVal === 'parham2010') {
                 document.getElementById('login-password').value = '';
                 showView('view-admin-panel');
                 return;
             }
 
-            const { data: users } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password);
+            // 2. چک کردن دیتابیس (معلم یا دانش‌آموز)
+            const { data: users } = await supabaseClient.from('users').select('*').eq('username', userVal).eq('password', passVal);
             
             if (users && users.length > 0) {
                 const user = users[0];
-                document.getElementById('login-password').value = ''; 
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-username').value = '';
                 currentUserName = user.name;
 
                 if (user.role === 'teacher') {
@@ -160,19 +179,13 @@
                     checkStudentClassStatus();
                 }
             } else {
-                alert('نام کاربری یا رمز عبور اشتباه است!');
+                alert('آیدی یا رمز عبور اشتباه است!');
             }
         }
 
-        function studentQuickEnter() {
-            const name = document.getElementById('login-username').value;
-            if(!name) return alert('لطفاً نام خود را در کادر اول وارد کنید');
-            currentUserName = name;
-            document.getElementById('student-name-display').innerText = name;
-            showView('view-student-panel');
-            checkStudentClassStatus();
-        }
-
+        // ----------------------------------------
+        // منطق کلاس
+        // ----------------------------------------
         async function startClass() {
             await supabaseClient.from('class_status').update({ is_active: true }).eq('id', 'main_class');
             document.getElementById('btn-start-class').classList.add('hidden');
@@ -219,34 +232,58 @@
             window.open(getJitsiLink(currentUserName), '_blank');
         }
 
-        async function addTeacher() {
-            const name = document.getElementById('teacher-name').value;
-            const username = document.getElementById('teacher-username').value;
-            const password = document.getElementById('teacher-password').value;
+        // ----------------------------------------
+        // مدیریت کاربران (ادمین)
+        // ----------------------------------------
+        async function addUser(role) {
+            let name, username, password;
+
+            if (role === 'student') {
+                name = document.getElementById('student-name').value;
+                username = document.getElementById('student-username').value;
+                password = document.getElementById('student-password').value;
+            } else {
+                name = document.getElementById('teacher-name').value;
+                username = document.getElementById('teacher-username').value;
+                password = document.getElementById('teacher-password').value;
+            }
 
             if(!name || !username || !password) return alert('لطفاً همه فیلدها را پر کنید');
 
-            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role: 'teacher' }]);
+            const { error } = await supabaseClient.from('users').insert([{ name, username, password, role }]);
             
             if (error) {
                 alert(error.code === '23505' ? 'این آیدی قبلا ثبت شده است!' : 'خطا: ' + error.message);
             } else {
-                alert('معلم با موفقیت ذخیره شد!');
-                document.getElementById('teacher-name').value = '';
-                document.getElementById('teacher-username').value = '';
-                document.getElementById('teacher-password').value = '';
+                alert(role === 'student' ? 'دانش‌آموز با موفقیت ذخیره شد!' : 'معلم با موفقیت ذخیره شد!');
+                if (role === 'student') {
+                    document.getElementById('student-name').value = '';
+                    document.getElementById('student-username').value = '';
+                    document.getElementById('student-password').value = '';
+                } else {
+                    document.getElementById('teacher-name').value = '';
+                    document.getElementById('teacher-username').value = '';
+                    document.getElementById('teacher-password').value = '';
+                }
                 showView('view-admin-panel');
             }
         }
 
-        async function loadTeachers() {
+        async function loadUsers() {
             const container = document.getElementById('user-list-container');
             container.innerHTML = 'در حال دریافت...';
-            const { data: users, error } = await supabaseClient.from('users').select('*').eq('role', 'teacher');
+            const { data: users, error } = await supabaseClient.from('users').select('*');
             container.innerHTML = '';
-            if (error || users.length === 0) return container.innerHTML = 'هیچ معلمی ثبت نشده است.';
+            if (error || users.length === 0) return container.innerHTML = 'هیچ کاربری ثبت نشده است.';
+            
             users.forEach(u => {
-                container.innerHTML += `<div class="user-item"><span>${u.name}</span><span style="color: #8b5cf6; font-family: sans-serif;">${u.username}</span></div>`;
+                const color = u.role === 'teacher' ? '#8b5cf6' : '#10b981';
+                const roleName = u.role === 'teacher' ? 'معلم' : 'دانش‌آموز';
+                container.innerHTML += `
+                    <div class="user-item">
+                        <span>${u.name} <small style="color:${color}; margin-right: 5px;">(${roleName})</small></span>
+                        <span style="color: #60a5fa; font-family: sans-serif;">${u.username}</span>
+                    </div>`;
             });
         }
     </script>
